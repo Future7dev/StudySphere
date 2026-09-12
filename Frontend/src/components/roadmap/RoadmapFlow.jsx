@@ -205,7 +205,7 @@ function buildBranchingGraph({
             target: sub.id,
             sourceHandle: 'bottom',
             targetHandle: 'top',
-            type: 'bezier',
+            type: 'default',
             style: {
               stroke: branchColor,
               strokeWidth: sub.status === 'in-progress' ? 2.5 : 1.75,
@@ -248,7 +248,7 @@ function buildBranchingGraph({
                 target: item.id,
                 sourceHandle: 'bottom',
                 targetHandle: 'top',
-                type: 'bezier',
+                type: 'default',
                 style: {
                   stroke: leafEdgeColor,
                   strokeWidth: 1.5,
@@ -411,7 +411,7 @@ function buildBranchingGraph({
             target: sub.id,
             sourceHandle: 'right-branches',
             targetHandle: 'left',
-            type: 'bezier',
+            type: 'default',
             style: {
               stroke: branchColor,
               strokeWidth: sub.status === 'in-progress' ? 2.5 : 1.75,
@@ -453,7 +453,7 @@ function buildBranchingGraph({
                 target: item.id,
                 sourceHandle: 'right',
                 targetHandle: 'left',
-                type: 'bezier',
+                type: 'default',
                 style: {
                   stroke: leafEdgeColor,
                   strokeWidth: 1.5,
