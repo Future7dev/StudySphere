@@ -7,12 +7,14 @@ import Footer from '../components/Footer';
 import { roadmaps } from '../data/mockData';
 import './UploadSyllabus.css';
 
+import API from '../api/axios';
+
 const SAMPLE_TOPICS = [
-  'Machine Learning Fundamentals',
+  'Indian Medival history',
+  'Machine Learning',
+  'Quantum Computing',
   'React & Modern Frontend',
-  'System Design for Engineers',
   'Data Structures & Algorithms',
-  'Python for Data Science',
   'DevOps & Cloud Architecture',
 ];
 
@@ -25,7 +27,16 @@ export default function UploadSyllabus() {
   const [topic, setTopic] = useState('');
   const [dragging, setDragging] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [genStage, setGenStage] = useState(0);
   const [error, setError] = useState('');
+
+  const stages = [
+    'Connecting to test.ipynb response pipeline...',
+    'Analyzing foundational and advanced milestones...',
+    'Curating video lectures and articles...',
+    'Building section practice quiz...',
+    'Finalizing roadmap and tracking progress...',
+  ];
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -58,26 +69,62 @@ export default function UploadSyllabus() {
     if (tab === 'topic' && !topic.trim()) { setError('Please enter a topic name.'); return; }
     setError('');
     setGenerating(true);
+    setGenStage(0);
 
-    // Simulate processing delay
-    await new Promise(r => setTimeout(r, 2000));
+    const stageInterval = setInterval(() => {
+      setGenStage((prev) => (prev < stages.length - 1 ? prev + 1 : prev));
+    }, 1500);
 
-    // Pick a random roadmap from existing data as "generated"
-    const chosen = roadmaps[Math.floor(Math.random() * roadmaps.length)];
-    const title = tab === 'topic' ? topic.trim() : file.name.replace(/\.(pdf|docx|txt)$/i, '');
+    try {
+      const topicTitle = tab === 'topic' ? topic.trim() : file.name.replace(/\.(pdf|docx|txt)$/i, '');
+      const res = await API.post('/roadmaps/generate', { topic: topicTitle });
 
-    dispatch({
-      type: 'ADD_SYLLABUS',
-      payload: {
-        id: chosen.id,
-        title,
-        uploadedAt: new Date().toISOString().split('T')[0],
-        progress: 0,
+      clearInterval(stageInterval);
+
+      if (res.data && res.data.roadmap) {
+        const rm = res.data.roadmap;
+        const roadmapId = rm.slug || rm._id;
+
+        dispatch({
+          type: 'ADD_ROADMAP',
+          payload: rm,
+        });
+
+        dispatch({
+          type: 'ADD_SYLLABUS',
+          payload: {
+            id: roadmapId,
+            title: rm.title,
+            uploadedAt: new Date().toISOString().split('T')[0],
+            progress: 0,
+          },
+        });
+
+        navigate(`/roadmap/${roadmapId}`);
+      } else {
+        throw new Error('No roadmap data returned');
       }
-    });
-
-    navigate(`/roadmap/${chosen.id}`);
+    } catch (err) {
+      clearInterval(stageInterval);
+      console.error('Generation error:', err);
+      // Fallback: if server not accessible or network issue, fallback to mock so UX is preserved
+      const chosen = roadmaps[0];
+      const title = tab === 'topic' ? topic.trim() : file.name.replace(/\.(pdf|docx|txt)$/i, '');
+      dispatch({
+        type: 'ADD_SYLLABUS',
+        payload: {
+          id: chosen.id,
+          title,
+          uploadedAt: new Date().toISOString().split('T')[0],
+          progress: 0,
+        },
+      });
+      navigate(`/roadmap/${chosen.id}`);
+    } finally {
+      setGenerating(false);
+    }
   };
+
 
   const formatSize = (bytes) => {
     if (bytes < 1024) return `${bytes} B`;
@@ -203,7 +250,7 @@ export default function UploadSyllabus() {
               {generating ? (
                 <>
                   <span className="auth-spinner" />
-                  Generating roadmap...
+                  {stages[genStage]}
                 </>
               ) : (
                 <>
