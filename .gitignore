@@ -25,4 +25,4 @@ __pycache__/
 .ipynb_checkpoints/
 >>>>>>> 39a3e42881067da0295992ddf51c4a8444d0235f
 .cenv
-
+cenv/
