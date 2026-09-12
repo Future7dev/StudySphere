@@ -25,8 +25,11 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const { uploadedSyllabi, user, quizResults } = state;
 
-  const totalProgress = Math.round(uploadedSyllabi.reduce((a, b) => a + b.progress, 0) / uploadedSyllabi.length);
+  const totalProgress = uploadedSyllabi.length > 0
+    ? Math.round(uploadedSyllabi.reduce((a, b) => a + (b.progress || 0), 0) / uploadedSyllabi.length)
+    : 0;
   const maxActivity = Math.max(...weeklyActivity.map(d => d.minutes));
+
 
   const getStatusIcon = (progress) => {
     if (progress === 100) return <CheckCircle2 size={14} className="ds-status-icon done" />;

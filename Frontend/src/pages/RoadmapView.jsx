@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -20,7 +20,9 @@ import Footer from '../components/Footer';
 import ProgressRing from '../components/ProgressRing';
 import RoadmapFlow from '../components/roadmap/RoadmapFlow';
 import { roadmaps } from '../data/mockData';
+import API from '../api/axios';
 import './RoadmapView.css';
+
 
 const statusConfig = {
   'completed':   { label: 'Completed',   icon: CheckCircle2, color: 'var(--success)', bg: 'var(--success-dim)', border: 'rgba(52,211,153,0.2)' },
@@ -74,23 +76,86 @@ function RoadmapListNode({ node, index, onSelect, selected }) {
 }
 
 export default function RoadmapView() {
+
   const { id } = useParams();
   const navigate = useNavigate();
-  const roadmap = roadmaps.find(r => r.id === id) || roadmaps[0];
-  
-  // Default to selecting the active in-progress node or the first node
-  const [selectedNode, setSelectedNode] = useState(() => {
-    return roadmap.nodes.find(n => n.status === 'in-progress') || roadmap.nodes[0] || null;
+  const { state, trackTopicProgress } = useApp();
+
+  const [roadmap, setRoadmap] = useState(() => {
+    return (
+      (state.roadmaps && state.roadmaps.find(r => r.slug === id || r.id === id || r._id === id)) ||
+      roadmaps.find(r => r.id === id) ||
+      roadmaps[0]
+    );
   });
+
+  const [loading, setLoading] = useState(false);
+  const [selectedNode, setSelectedNode] = useState(null);
   const [viewMode, setViewMode] = useState('flow'); // 'flow' | 'list'
 
-  const totalSubs = roadmap.nodes.reduce((a, n) => a + (n.subtopics?.length || 0), 0);
-  const completedSubs = roadmap.nodes.reduce((a, n) => a + (n.subtopics ? n.subtopics.filter(s => s.status === 'completed').length : 0), 0);
-  const overallPct = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : 0;
+  // Fetch roadmap from backend API
+  useEffect(() => {
+    let isMounted = true;
+    const fetchRoadmap = async () => {
+      try {
+        setLoading(true);
+        const res = await API.get(`/roadmaps/${id}`);
+        if (isMounted && res.data) {
+          setRoadmap(res.data);
+          // Set initial selected node
+          const nodes = res.data.nodes || [];
+          const active = nodes.find(n => n.status === 'in-progress') || nodes[0] || null;
+          setSelectedNode(active);
+        }
+      } catch (err) {
+        console.warn('Could not fetch roadmap from backend, using state/mock:', err.message);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchRoadmap();
+    return () => { isMounted = false; };
+  }, [id]);
+
+  useEffect(() => {
+    if (!selectedNode && roadmap.nodes && roadmap.nodes.length > 0) {
+      setSelectedNode(roadmap.nodes.find(n => n.status === 'in-progress') || roadmap.nodes[0]);
+    }
+  }, [roadmap]);
+
+  // Toggle completion of a subtopic or leaf item
+  const handleToggleSubComplete = async (e, subId, currentStatus) => {
+    e.stopPropagation();
+    const newStatus = currentStatus === 'completed' ? 'not-started' : 'completed';
+    const roadmapId = roadmap.slug || roadmap._id || roadmap.id;
+
+    // Optimistically update local roadmap nodes
+    setRoadmap(prev => {
+      const newNodes = (prev.nodes || []).map(node => {
+        const newSubs = (node.subtopics || []).map(sub => {
+          if (sub.id === subId) {
+            return { ...sub, status: newStatus };
+          }
+          return sub;
+        });
+        return { ...node, subtopics: newSubs };
+      });
+      return { ...prev, nodes: newNodes };
+    });
+
+    if (trackTopicProgress) {
+      await trackTopicProgress(roadmapId, subId, newStatus);
+    }
+  };
+
+  const totalSubs = (roadmap.nodes || []).reduce((a, n) => a + (n.subtopics?.length || 0), 0);
+  const completedSubs = (roadmap.nodes || []).reduce((a, n) => a + (n.subtopics ? n.subtopics.filter(s => s.status === 'completed').length : 0), 0);
+  const overallPct = totalSubs > 0 ? Math.round((completedSubs / totalSubs) * 100) : (roadmap.overallProgress || 0);
 
   const handleSelect = (node) => {
     setSelectedNode(node);
   };
+
 
   return (
     <div className="page-layout">
@@ -220,9 +285,24 @@ export default function RoadmapView() {
                             <span className="rm-sub-title">{sub.title}</span>
                           </div>
                           <div className="rm-sub-right">
-                            <span className="rm-sub-status" style={{ color: cfg.color }}>
-                              <Icon size={12} className={sub.status === 'in-progress' ? 'spin-slow' : ''} /> {cfg.label}
-                            </span>
+                            <button
+                              className="rm-sub-status-toggle"
+                              title="Toggle completion status"
+                              onClick={(e) => handleToggleSubComplete(e, sub.id, sub.status)}
+                              style={{
+                                color: cfg.color,
+                                background: 'transparent',
+                                border: 'none',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                                fontSize: '12px'
+                              }}
+                            >
+                              <Icon size={12} className={sub.status === 'in-progress' ? 'spin-slow' : ''} />
+                              <span>{cfg.label}</span>
+                            </button>
                             <ChevronRight size={13} className="rm-sub-arrow" />
                           </div>
                         </div>
@@ -230,7 +310,13 @@ export default function RoadmapView() {
                         {items.length > 0 && (
                           <div className="rm-sub-items-nest">
                             {items.map((it) => (
-                              <div key={it.id} className={`rm-sub-item-leaf ${it.status}`}>
+                              <div
+                                key={it.id}
+                                className={`rm-sub-item-leaf ${it.status}`}
+                                onClick={(e) => handleToggleSubComplete(e, it.id, it.status)}
+                                style={{ cursor: 'pointer' }}
+                                title="Click to toggle item completion"
+                              >
                                 <span className="rm-leaf-dot" />
                                 <span>{it.title}</span>
                               </div>
@@ -245,7 +331,7 @@ export default function RoadmapView() {
                 {/* Action Buttons */}
                 <div className="rm-detail-actions">
                   <Link
-                    to={`/topic/${selectedNode.id}`}
+                    to={`/topic/${selectedNode.subtopics?.[0]?.id || selectedNode.id}`}
                     className="btn btn-primary w-full"
                     style={{ justifyContent: 'center' }}
                   >
@@ -253,12 +339,13 @@ export default function RoadmapView() {
                   </Link>
 
                   <Link
-                    to={`/quiz/${selectedNode.id}`}
+                    to={`/quiz/${roadmap.slug || roadmap._id || selectedNode.id}`}
                     className="btn btn-ghost w-full"
                     style={{ justifyContent: 'center' }}
                   >
                     <Award size={14} /> Practice Section Quiz
                   </Link>
+
                 </div>
               </aside>
             )}
