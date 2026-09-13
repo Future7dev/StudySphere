@@ -11,6 +11,9 @@ Frontend/node_modules/
 # Build and logs
 Frontend/dist/
 *.log
+<<<<<<< HEAD
+module.json
+=======
 
 # Python / Jupyter
 venv/
@@ -20,3 +23,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .ipynb_checkpoints/
+>>>>>>> 39a3e42881067da0295992ddf51c4a8444d0235f
+.cenv
+cenv/

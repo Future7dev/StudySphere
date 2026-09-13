@@ -1067,47 +1067,58 @@
         ],
         "roadmap": {
             "topic_name": "Indian Medieval History",
-            "definition": "The historical era of the Indian subcontinent spanning roughly from the 6th century to the 18th century, characterized by the rise and fall of major dynasties, cultural synthesis, and significant socio-economic transformations.",
+            "definition": "The study of the Indian subcontinent from the fall of the Gupta Empire and the end of the ancient period (around the 8th century CE) to the beginning of the modern era and British dominance (around the 18th century CE).",
             "subtopics": [
                 {
-                    "subtopic_name": "Early Medieval India (750 - 1200 CE)",
+                    "subtopic_name": "Early Medieval Period (750\u20131200 CE)",
                     "difficulty": "Low",
-                    "definition": "This period covers the political fragmentation after the Gupta Empire, highlighting regional powers in Northern, Central, and Southern India before the establishment of Islamic sultanates.",
+                    "definition": "An era marked by regional political fragmentation, feudal social structures, and the emergence of major regional dynasties across North, Central, and South India.",
                     "topics": [
                         {
-                            "name": "The Tripartite Struggle and Northern Dynasties",
+                            "name": "Tripartite Struggle",
                             "difficulty": "Low",
-                            "definition": "Examines the dynamic conflict between the Palas, Pratiharas, and Rashtrakutas for control over Kanauj and Northern India.",
-                            "Links": "https://www.youtube.com/watch?v=5LIJ4VjVSGE",
+                            "definition": "The multi-generational conflict among the Palas, Gurjara-Pratiharas, and Rashtrakutas for political control over the imperial city of Kannauj.",
+                            "Links": "https://www.youtube.com/watch?v=MMYjFdCYPL4",
                             "articles": [
-                                "https://en.wikipedia.org/wiki/Tripartite_Struggle",
-                                "https://pendulumedu.com/general-awareness/early-medieval-period-of-india",
-                                "https://www.studocu.com/row/document/universiteti-i-prishtines/ias-accounting/315-history-eng-lesson-8/48380019"
+                                "https://lotusarise.com/early-medieval-india-750-1200-major-political-developments",
+                                "https://rezavisblastfromthepast.co.in/2021/04/08/the-tripartite-struggle-in-north-india-750-to-1200-ad",
+                                "https://byjus.com/free-ias-prep/early-medieval-northern-india-upsc-notes"
                             ]
                         },
                         {
-                            "name": "The Chola Empire and Southern Kingdoms",
+                            "name": "The Imperial Cholas",
                             "difficulty": "Medium",
-                            "definition": "Focuses on the administrative excellence, maritime trade, and cultural achievements of the Chola Dynasty in South India.",
-                            "Links": "https://www.youtube.com/watch?v=P4dgAbx4oHE",
+                            "definition": "The rise of the Chola Dynasty in South India, celebrated for maritime trade, naval expansion, local self-governance, and monumental Dravidian temple architecture.",
+                            "Links": "https://www.youtube.com/watch?v=H41IdbRLVu4",
                             "articles": [
-                                "CAESswEB6zswFUzZYYe8aPjgzvRgVmpn6yEXstGgmqeNAMh_Ho4TAv8KTkQL4G6VnDjuBkkkDEhiUzflvr0yuBcB8OKYcgsRTkmUnglfc-aiEbXfrBdAOGhgZ2daoXkk_ahxvscYu7fz86YuBE11qiEezEIn4cFrr6Vn_C3ledtmnz2C_yUPvo2aWDHOZf5Kjtji2tcNZEY5aoblXFjtfgcGQrYi66dW7FGveVnndJI7reFwcLnxPQ",
-                                "CAESYgHrOzAV7IU4NM0OCm-Y5dj-AtQA3OR4oDbOXafSJNczNi6kDUC0T_zNMn4gFfeLTRZA_3shM55AM2aJ5OREveS2ZkkuCWX1Qm-eJo7iCHn74-ZYAClM_xZ1XzpPyyRuZ1No",
-                                "CAESZwHrOzAVVwaDJMoKkGfhNGwymca-bkn-vQcIEj4h81GulWltx8xnQvxszk7olgzRMjIRpKkskrLrogAuxP0ra3UBP-3xID37BBEr3ijBYNfRyem5dGQEJdGRCh3x2vHIgBT-LVvCrfM"
+                                "https://en.wikipedia.org/wiki/Chola_Empire",
+                                "https://itihaas.ai/en/maps/chola-dynasty",
+                                "https://www.scribd.com/presentation/855697691/1-Early-Medieval-India"
+                            ]
+                        },
+                        {
+                            "name": "Rajput Kingdoms and Feudal Culture",
+                            "difficulty": "Low",
+                            "definition": "The emergence of Rajput clans in North-Western India, their socio-political hierarchy, defense strategies, and cultural patronage.",
+                            "Links": "https://www.youtube.com/watch?v=gzfRZQqIwBo",
+                            "articles": [
+                                "https://lotusarise.com/early-medieval-india-750-1200-major-political-developments",
+                                "https://study.com/academy/lesson/rajput-history-kingdoms-facts-india.html",
+                                "https://en.wikipedia.org/wiki/Rajput"
                             ]
                         }
                     ]
                 },
                 {
-                    "subtopic_name": "The Delhi Sultanate (1206 - 1526 CE)",
+                    "subtopic_name": "The Delhi Sultanate (1206\u20131526 CE)",
                     "difficulty": "Medium",
-                    "definition": "Covers five successive dynasties that ruled from Delhi, transforming the socio-political landscape and introduction of Indo-Islamic administration.",
+                    "definition": "The establishment and evolution of Islamic rule in North India across five major dynasties: Mamluk, Khilji, Tughlaq, Sayyid, and Lodi.",
                     "topics": [
                         {
-                            "name": "Dynasties of Delhi Sultanate",
+                            "name": "Mamluk and Khilji Dynasties",
                             "difficulty": "Medium",
-                            "definition": "Overview of the Slave, Khilji, Tughlaq, Sayyid, and Lodi dynasties, including key rulers like Iltutmish, Alauddin Khilji, and Muhammad bin Tughlaq.",
-                            "Links": "https://www.youtube.com/watch?v=TSHW2_4KOGM",
+                            "definition": "The foundation of sultanate power under Qutb-ud-din Aibak and Iltutmish, followed by Alauddin Khilji's centralizing agrarian, price-control, and military reforms.",
+                            "Links": "https://www.youtube.com/watch?v=x0K5K5aNorY",
                             "articles": [
                                 "https://byjus.com/free-ias-prep/sultanate-of-delhi",
                                 "https://www.crazygktrick.com/blog/the-delhi-sultanate-five-dynasties-explained",
@@ -1115,101 +1126,132 @@
                             ]
                         },
                         {
-                            "name": "Sultanate Administration, Economy, and Culture",
+                            "name": "Tughlaq, Sayyid, and Lodi Dynasties",
                             "difficulty": "Medium",
-                            "definition": "An analysis of the Iqta system, revenue administrative models, market reforms, and early Indo-Islamic architectural developments.",
-                            "Links": "https://www.youtube.com/watch?v=TSHW2_4KOGM",
+                            "definition": "The aggressive expansion and administrative experimentation under Muhammad bin Tughlaq, the rise of Firoz Shah Tughlaq, and the eventual decline under the Lodis.",
+                            "Links": "https://www.youtube.com/watch?v=BhQry1YZj_E",
                             "articles": [
-                                "CAESbQHrOzAVhg4VsdrpNfpZFX-1Qb12Fmsng_viOUGVcRUT6qt54Vp673-dgwTZQJfb_NM40Fo6BoAaP96By58xsff2hr7h1gYBKJmMef-HYT-cSGaSV7O5vdQCwmtEmhaslOu-jNVTv98-FEcZ890",
-                                "CAESZwHrOzAVeVYE5egFySrK5212z92YIXES__Nl2CafMUWzXJdtIDFU-6RQtV9dRr7zQmXT2Nqs1ifp80bYxk3CqYCZXiRTe5TBf_itrribRzSsC4_hFa7AL3szszUrYvBkVGCX1IhUCfQ",
-                                "CAESZQHrOzAVqVo8-tVlV7T7Yo5INV_h6kWtmDPdw9rR27vk9GY0rgqrB6C_vcpetIuPSLUoPDeGDJ6w0n3YHvrUTZYllk27ljgiP-eacJ_Koh-7GwgzOIF1UVhgGj3g1p_hU4ye_--N"
+                                "https://www.crazygktrick.com/blog/the-delhi-sultanate-five-dynasties-explained",
+                                "https://byjus.com/free-ias-prep/sultanate-of-delhi",
+                                "https://en.wikipedia.org/wiki/Delhi_Sultanate"
+                            ]
+                        },
+                        {
+                            "name": "Sultanate Administration, Economy, and Indo-Islamic Art",
+                            "difficulty": "High",
+                            "definition": "The Iqta revenue system, urban development, trade routes, and the synthesis of Indian and Islamic architectural styles like arches, domes, and minarets.",
+                            "Links": "https://www.youtube.com/watch?v=AtU9EmQdF0s",
+                            "articles": [
+                                "https://lotusarise.com/administration-of-delhi-sultanate",
+                                "https://en.wikipedia.org/wiki/Delhi_Sultanate",
+                                "https://www.youtube.com/watch?v=XF_dbbzXCOA"
                             ]
                         }
                     ]
                 },
                 {
-                    "subtopic_name": "Socio-Religious Movements & Regional Empires",
+                    "subtopic_name": "Regional Kingdoms and Religious Movements",
                     "difficulty": "Medium",
-                    "definition": "Explores medieval religious revivalism alongside the emergence of strong regional kingdoms in Southern and Western India.",
+                    "definition": "The emergence of powerful non-Sultanate empires alongside transformational socio-religious reformations across the subcontinent.",
                     "topics": [
-                        {
-                            "name": "Bhakti and Sufi Movements",
-                            "difficulty": "Low",
-                            "definition": "Covers the egalitarian religious reformations led by medieval saints and mystic Sufi orders across India.",
-                            "Links": "https://www.youtube.com/watch?v=PNpBa2qAzew",
-                            "articles": [
-                                "https://plutusias.com/bhakti-sufi-movements",
-                                "https://www.scribd.com/document/851579751/Unit-1-2-Bhakti-and-Sufi-movements",
-                                "https://edubirdie.com/docs/monmouth-university/hs-283-the-civilizations-of-asia-indi/133206-bhakti-and-sufi-movement"
-                            ]
-                        },
                         {
                             "name": "Vijayanagara and Bahmani Empires",
                             "difficulty": "Medium",
-                            "definition": "Detailed study of the rival southern powers, their administrative structures, urban architecture, and foreign trade.",
-                            "Links": "https://www.youtube.com/watch?v=DFBwLqV4e5Y",
+                            "definition": "The political rivalry, urban magnificence, and socio-economic institutions of the Vijayanagara Empire in the Deccan alongside the Bahmani Sultanate and its successor Deccan Sultanates.",
+                            "Links": "https://www.youtube.com/watch?v=JJS3fuIs3KA",
                             "articles": [
                                 "https://study.com/academy/lesson/vijayanagar-empire-culture-literature-religion.html",
                                 "https://en.wikipedia.org/wiki/Vijayanagara_Empire",
-                                "https://study.com/academy/lesson/vijayanagar-empire-economy-society.html"
+                                "https://study.com/academy/lesson/video/vijayanagar-empire-culture-literature-religion.html"
+                            ]
+                        },
+                        {
+                            "name": "The Bhakti Movement",
+                            "difficulty": "Low",
+                            "definition": "A egalitarian religious movement emphasizing personal devotion to God, vernacular literature, and social reform led by saints like Kabir, Mirabai, Ramananda, and Chaitanya.",
+                            "Links": "https://www.youtube.com/watch?v=SZUipvwNx3w",
+                            "articles": [
+                                "https://en.wikipedia.org/wiki/Bhakti_movement",
+                                "https://study.com/academy/lesson/bhakti-movement-definition-features-spread-impact-on-indian-society.html",
+                                "https://banotes.org/india-c-1206-1707/bhakti-movement-expansion-north-india-diversity-impact"
+                            ]
+                        },
+                        {
+                            "name": "The Sufi Movement",
+                            "difficulty": "Low",
+                            "definition": "The mystical dimension of Islam in India, focusing on divine love, asceticism, brotherhood, and the influence of Silsilas (orders) like the Chishti and Suhrawardi.",
+                            "Links": "https://www.youtube.com/watch?v=vjKo_kH-pWw",
+                            "articles": [
+                                "https://lotusarise.com/sufi-movements-upsc",
+                                "https://en.wikipedia.org/wiki/Sufism",
+                                "https://ucanapplym.s3.ap-south-1.amazonaws.com/RGU/notifications/E_learning/0nline_study/PG%202nd%20Semester%28Sufi%20%26%20Bhakti%20Movement%29%20B.N.GIRI.pdf"
                             ]
                         }
                     ]
                 },
                 {
-                    "subtopic_name": "The Mughal Empire (1526 - 1707 CE)",
+                    "subtopic_name": "The Mughal Empire (1526\u20131707 CE)",
                     "difficulty": "High",
-                    "definition": "Detailed examination of the establishment, consolidation, administrative machinery, and cultural zenith of the Mughal dynasty.",
+                    "definition": "The consolidation of one of the largest early modern gunpowder empires in world history, characterized by military prowess, bureaucratic innovation, and cultural synthesis.",
                     "topics": [
                         {
-                            "name": "Establishment and Expansion (Babur to Akbar)",
+                            "name": "Establishment and Expansion: Babur to Akbar",
                             "difficulty": "Medium",
-                            "definition": "Traces the foundation by Babur, Humayun's struggles, Akbar's conquests, and religious/administrative policy innovations like Din-i-Ilahi.",
+                            "definition": "The foundation of Mughal rule by Babur at Panipat, Humayun's struggles, and Akbar's policy of imperial consolidation, Sulh-i-kul, and Rajput alliances.",
                             "Links": "https://www.youtube.com/watch?v=oPNOFbI8zzM",
                             "articles": [
-                                "https://en.wikipedia.org/wiki/Mughal_Empire",
-                                "https://www.studocu.com/en-us/document/north-central-high-school/world-history/mughal-empire-overview-key-leaders-culture-and-economy-ap-world-history/144188903",
-                                "https://www.bbc.co.uk/bitesize/articles/z8jcdnb"
+                                "https://www.facebook.com/TarikhiHind/posts/the-mughal-empire-15261857-was-one-of-the-most-powerful-early-modern-islamic-emp/984069291039450",
+                                "https://www.youtube.com/watch?v=fMsmCxIEQr4"
                             ]
                         },
                         {
-                            "name": "Peak Era and Administration (Jahangir to Aurangzeb)",
+                            "name": "The Zenith of Mughals: Jahangir, Shah Jahan, and Aurangzeb",
                             "difficulty": "High",
-                            "definition": "Covers the reign of Jahangir, Shah Jahan, and Aurangzeb, examining the Mansabdari/Jagirdari systems, architectural milestones, and imperial overextension.",
-                            "Links": "https://www.youtube.com/watch?v=37hz0VKNmzU",
+                            "definition": "The golden age of Mughal art, monumental architecture under Shah Jahan, and the imperial territorial expansion alongside religio-political conflicts under Aurangzeb.",
+                            "Links": "https://www.youtube.com/watch?v=SrOYfEp9_mk",
                             "articles": [
                                 "https://en.wikipedia.org/wiki/Mughal_Empire",
-                                "https://www.vajiraoinstitute.com/upsc-ias-current-affairs/mughal-empire.aspx",
-                                "https://www.britannica.com/topic/Mughal-dynasty"
+                                "https://factsanddetails.com/india/History/sub7_1b/entry-4114.html",
+                                "https://sahistory.org.za/article/history-grade-10-topic-1-mughal-empire"
+                            ]
+                        },
+                        {
+                            "name": "Mughal Institutions: Mansabdari System and Jagirdari System",
+                            "difficulty": "High",
+                            "definition": "The administrative, military rank-assignment (Mansab), and land-revenue assignment (Jagir) frameworks that held the imperial state machinery together.",
+                            "Links": "https://www.youtube.com/watch?v=MT7uA0-xE6g",
+                            "articles": [
+                                "https://www.instagram.com/reel/DVuzh4KEhUA?hl=en",
+                                "https://www.youtube.com/shorts/7fkMMT6_Gfk"
                             ]
                         }
                     ]
                 },
                 {
-                    "subtopic_name": "Decline of Mughals & Rise of Marathas",
+                    "subtopic_name": "Decline of the Mughals and Rise of Marathas (18th Century)",
                     "difficulty": "High",
-                    "definition": "Analyzes the disintegration of central imperial authority in the 18th century and the rise of regional powers led by the Marathas.",
+                    "definition": "The political transition period marked by the fragmentation of Mughal central authority, foreign invasions, and the rise of regional powers like the Marathas.",
                     "topics": [
                         {
-                            "name": "The Maratha Empire and Shivaji",
+                            "name": "Rise of the Maratha Empire",
                             "difficulty": "Medium",
-                            "definition": "Examines the foundation of Maratha Swarajya by Chhatrapati Shivaji Maharaj, guerrilla warfare tactics, and administrative structure.",
-                            "Links": "https://www.youtube.com/watch?v=mDAvWi0_wr8",
+                            "definition": "Chhatrapati Shivaji Maharaj's guerrilla tactics, state formation, swarajya concept, and the expansion of Maratha power under the Peshwas across North India.",
+                            "Links": "https://www.youtube.com/watch?v=f2YTAgEx4bA",
                             "articles": [
-                                "https://lotusarise.com/maratha-empire-upsc",
-                                "https://www.ijrar.org/papers/IJRAR19D5722.pdf",
-                                "https://ijfans.org/uploads/paper/41eb984673f56414c56eb56bab153be6.pdf"
+                                "https://www.youtube.com/watch?v=--Ly9qdkQ1Y",
+                                "https://en.wikipedia.org/wiki/Maratha_Empire",
+                                "https://www.britannica.com/topic/Maratha-Empire"
                             ]
                         },
                         {
-                            "name": "Decline of Mughal Empire and Successor States",
+                            "name": "Fragmentation and Successor States",
                             "difficulty": "High",
-                            "definition": "Covers the internal agrarian crisis, foreign invasions by Nadir Shah and Ahmad Shah Abdali, and the emergence of independent autonomous states.",
-                            "Links": "https://www.youtube.com/watch?v=UaX-tWH1HgM",
+                            "definition": "The decline of central imperial control following Aurangzeb's death, external invasions by Nadir Shah and Ahmad Shah Abdali, and the independence of Awadh, Bengal, and Hyderabad.",
+                            "Links": "https://www.youtube.com/watch?v=gVpoB-eqnog",
                             "articles": [
-                                "https://educationprovince.com/decline-of-mughal-empire",
-                                "https://www.scribd.com/document/828101571/NOTEBOOK-PLAN18-Cent-Pol-Formations",
-                                "https://en.wikipedia.org/wiki/Decline_of_the_Mughal_Empire"
+                                "https://brainly.in/question/57452577",
+                                "https://memorients.com/articles/the-mughals-during-the-long-eighteenth-century-instability-and-successor-states",
+                                "https://www.bhu.ac.in/Content/Syllabus/Syllabus_300620200413052929.pdf"
                             ]
                         }
                     ]
@@ -1219,59 +1261,59 @@
         "quiz": {
             "questions": [
                 {
-                    "question": "Who was the founder of the Slave Dynasty in India?",
+                    "question": "Who was the founder of the Slave Dynasty (Mamluk Dynasty) in India?",
                     "options": [
                         "Iltutmish",
-                        "Qutb-ud-din Aibak",
-                        "Balban",
+                        "Qutb ud-Din Aibak",
+                        "Ghiyas ud din Balban",
                         "Razia Sultana"
                     ],
-                    "correct_answer": "Qutb-ud-din Aibak",
-                    "explanation": "Qutb-ud-din Aibak founded the Slave Dynasty (Mamluk Dynasty) in 1206 CE after the death of Muhammad Ghori."
+                    "correct_answer": "Qutb ud-Din Aibak",
+                    "explanation": "Qutb ud-Din Aibak was a general of Muhammad Ghori who established the Mamluk Dynasty in 1206 CE after Ghori's death."
                 },
                 {
-                    "question": "The Battle of Khanwa in 1527 was fought between Mughal Emperor Babur and which Rajput ruler?",
+                    "question": "Which Mughal Emperor introduced the military administrative system known as 'Mansabdari'?",
                     "options": [
-                        "Rana Sanga",
-                        "Maharana Pratap",
-                        "Rana Kumbha",
-                        "Raja Man Singh"
-                    ],
-                    "correct_answer": "Rana Sanga",
-                    "explanation": "The Battle of Khanwa was fought in 1527 between Mughal Emperor Babur and Rana Sanga of Mewar, securing Mughal dominance in Northern India."
-                },
-                {
-                    "question": "Which medieval Indian ruler introduced the system of 'Dagh' (branding of horses) and 'Chehra' (descriptive roll of soldiers)?",
-                    "options": [
+                        "Babur",
                         "Akbar",
-                        "Alauddin Khilji",
-                        "Firoz Shah Tughlaq",
-                        "Sher Shah Suri"
+                        "Shah Jahan",
+                        "Aurangzeb"
                     ],
-                    "correct_answer": "Alauddin Khilji",
-                    "explanation": "Alauddin Khilji introduced the Dagh and Chehra systems to prevent military corruption and ensure army preparedness."
+                    "correct_answer": "Akbar",
+                    "explanation": "Akbar introduced the Mansabdari system to classify officials and organize military capability and civil administration throughout the empire."
                 },
                 {
-                    "question": "The Vijayanagara Empire was founded in 1336 CE by which two brothers?",
+                    "question": "The Battle of Talikota in 1565 resulted in the downfall of which prominent south Indian kingdom?",
                     "options": [
-                        "Harihara I and Bukka Raya I",
-                        "Krishnadevaraya and Achyuta Deva Raya",
-                        "Rama Raya and Tirumala Raya",
-                        "Harihara II and Deva Raya I"
+                        "Vijayanagara Empire",
+                        "Bahmani Sultanate",
+                        "Chola Empire",
+                        "Hoysala Empire"
                     ],
-                    "correct_answer": "Harihara I and Bukka Raya I",
-                    "explanation": "The Vijayanagara Empire was established in 1336 CE by brothers Harihara I and Bukka Raya I of the Sangama Dynasty along the Tungabhadra River."
+                    "correct_answer": "Vijayanagara Empire",
+                    "explanation": "The Battle of Talikota was fought between the Vijayanagara Empire and an alliance of Deccan Sultanates, leading to the destruction and collapse of Vijayanagara."
                 },
                 {
-                    "question": "Who was the author of 'Akbarnama' and 'Ain-i-Akbari', the official court history of Emperor Akbar?",
+                    "question": "Which medieval ruler rebuilt and extended the ancient network of roads into the Sadak-e-Azam, later known as the Grand Trunk Road?",
                     "options": [
-                        "Gulbadan Begum",
-                        "Abul Fazl",
-                        "Abdul Qadir Badauni",
-                        "Faizi"
+                        "Alauddin Khalji",
+                        "Sher Shah Suri",
+                        "Humayun",
+                        "Jahangir"
                     ],
-                    "correct_answer": "Abul Fazl",
-                    "explanation": "Abul Fazl, one of the Navaratnas in Akbar's court, wrote the Akbarnama, a comprehensive history of Emperor Akbar's reign."
+                    "correct_answer": "Sher Shah Suri",
+                    "explanation": "Sher Shah Suri constructed the Sadak-e-Azam to connect eastern and western regions of his empire, which was later renamed the Grand Trunk Road."
+                },
+                {
+                    "question": "Which 17th-century Marathi Bhakti saint composed devotional poetry known as 'Abhangas' dedicated to Lord Vitthala?",
+                    "options": [
+                        "Kabir",
+                        "Tulsidas",
+                        "Sant Tukaram",
+                        "Guru Nanak"
+                    ],
+                    "correct_answer": "Sant Tukaram",
+                    "explanation": "Sant Tukaram was a prominent poet-saint of the Bhakti movement in Maharashtra who wrote devotional poetry called Abhangas."
                 }
             ]
         }

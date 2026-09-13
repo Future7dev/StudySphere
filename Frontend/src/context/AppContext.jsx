@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import { roadmaps, userProfile } from '../data/mockData';
+import API from '../api/axios';
 
 const AppContext = createContext(null);
+
 
 const savedUser = (() => {
   try {
@@ -49,12 +51,39 @@ function reducer(state, action) {
       return { ...state, isAuthenticated: false, user: userProfile };
     case 'SIGNUP':
       return { ...state, isAuthenticated: true, user: { ...state.user, ...action.payload } };
+    case 'SET_ROADMAPS':
+      return { ...state, roadmaps: action.payload };
+    case 'ADD_ROADMAP':
+      return {
+        ...state,
+        roadmaps: [action.payload, ...state.roadmaps.filter(r => r.id !== action.payload.id && r.slug !== action.payload.slug)],
+      };
+    case 'SET_USER_DATA':
+      return { ...state, user: { ...state.user, ...action.payload } };
     case 'MARK_TOPIC':
-      return { ...state, topicProgress: { ...state.topicProgress, [action.payload.id]: action.payload.status } };
+      return {
+        ...state,
+        topicProgress: { ...state.topicProgress, [action.payload.id]: action.payload.status },
+      };
+    case 'SET_TOPIC_PROGRESS':
+      return {
+        ...state,
+        topicProgress: { ...state.topicProgress, ...action.payload },
+      };
     case 'ADD_SYLLABUS':
       return {
         ...state,
-        uploadedSyllabi: [action.payload, ...state.uploadedSyllabi],
+        uploadedSyllabi: [
+          action.payload,
+          ...state.uploadedSyllabi.filter(s => s.id !== action.payload.id),
+        ],
+      };
+    case 'UPDATE_SYLLABUS_PROGRESS':
+      return {
+        ...state,
+        uploadedSyllabi: state.uploadedSyllabi.map(s =>
+          s.id === action.payload.id ? { ...s, progress: action.payload.progress } : s
+        ),
       };
     case 'SAVE_QUIZ_RESULT':
       return { ...state, quizResults: [action.payload, ...state.quizResults] };
@@ -63,10 +92,60 @@ function reducer(state, action) {
   }
 }
 
+
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Sync user dashboard and roadmaps from backend
+  const fetchDashboardData = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        const res = await API.get('/roadmaps/user/dashboard-summary');
+        if (res.data.syllabi && res.data.syllabi.length > 0) {
+          res.data.syllabi.forEach(s => {
+            dispatch({ type: 'ADD_SYLLABUS', payload: s });
+          });
+        }
+        if (res.data.user) {
+          dispatch({ type: 'SET_USER_DATA', payload: res.data.user });
+        }
+      }
+
+      // Also fetch roadmaps from Express
+      const rmRes = await API.get('/roadmaps');
+      if (Array.isArray(rmRes.data) && rmRes.data.length > 0) {
+        dispatch({ type: 'SET_ROADMAPS', payload: rmRes.data });
+      }
+    } catch (err) {
+      // Graceful fallback to initial mock state if backend not ready
+      console.warn('Backend sync note:', err.message);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchDashboardData();
+  }, [state.isAuthenticated]);
+
+  // Track topic progress live with the backend
+  const trackTopicProgress = async (roadmapId, itemId, status) => {
+    dispatch({ type: 'MARK_TOPIC', payload: { id: itemId, status } });
+    try {
+      const res = await API.patch(`/roadmaps/${roadmapId}/progress`, { itemId, status });
+      if (res.data && res.data.progressPercentage !== undefined) {
+        dispatch({
+          type: 'UPDATE_SYLLABUS_PROGRESS',
+          payload: { id: roadmapId, progress: res.data.progressPercentage },
+        });
+      }
+      return res.data;
+    } catch (err) {
+      console.warn('Progress API sync note:', err.message);
+    }
+  };
+
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
+    <AppContext.Provider value={{ state, dispatch, trackTopicProgress, fetchDashboardData }}>
       {children}
     </AppContext.Provider>
   );
@@ -77,3 +156,4 @@ export function useApp() {
   if (!ctx) throw new Error('useApp must be inside AppProvider');
   return ctx;
 }
+

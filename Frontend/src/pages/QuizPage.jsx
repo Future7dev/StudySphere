@@ -55,26 +55,52 @@ function ResultsScreen({ quiz, answers, onRetry, onContinue }) {
   );
 }
 
+import API from '../api/axios';
+
 export default function QuizPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { dispatch } = useApp();
+  const { state, dispatch, fetchDashboardData } = useApp();
 
-  const quiz = quizzes[id] || quizzes['javascript'];
+  const [quiz, setQuiz] = useState(() => {
+    const rm = (state.roadmaps || []).find(r => r.slug === id || r.id === id || r._id === id);
+    if (rm && rm.quiz && rm.quiz.questions && rm.quiz.questions.length > 0) {
+      return rm.quiz;
+    }
+    return quizzes[id] || quizzes['javascript'];
+  });
+
   const [phase, setPhase] = useState('quiz'); // 'quiz' | 'results'
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState(new Array(quiz.questions.length).fill(null));
   const [selected, setSelected] = useState(null);
-  const [timeLeft, setTimeLeft] = useState(quiz.timePerQuestion);
+  const [timeLeft, setTimeLeft] = useState(quiz.timePerQuestion || 30);
   const [showFeedback, setShowFeedback] = useState(false);
   const timerRef = useRef(null);
 
-  const q = quiz.questions[current];
+  // Fetch quiz from backend if available
+  useEffect(() => {
+    const fetchQuiz = async () => {
+      try {
+        const res = await API.get(`/roadmaps/${id}/quiz`);
+        if (res.data && res.data.questions && res.data.questions.length > 0) {
+          setQuiz(res.data);
+          setAnswers(new Array(res.data.questions.length).fill(null));
+          setTimeLeft(res.data.timePerQuestion || 30);
+        }
+      } catch (err) {
+        // Keep fallback quiz
+      }
+    };
+    fetchQuiz();
+  }, [id]);
+
+  const q = quiz.questions[current] || quiz.questions[0];
   const isLastQuestion = current === quiz.questions.length - 1;
 
   useEffect(() => {
     if (phase !== 'quiz' || showFeedback) return;
-    setTimeLeft(quiz.timePerQuestion);
+    setTimeLeft(quiz.timePerQuestion || 30);
     timerRef.current = setInterval(() => {
       setTimeLeft(t => {
         if (t <= 1) {
@@ -103,18 +129,31 @@ export default function QuizPage() {
     setShowFeedback(true);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setShowFeedback(false);
     setSelected(null);
     if (isLastQuestion) {
       const correct = answers.filter((a, i) => a === quiz.questions[i].correctIndex).length;
       const score = Math.round((correct / quiz.questions.length) * 100);
-      dispatch({ type: 'SAVE_QUIZ_RESULT', payload: { title: quiz.title, score, date: new Date().toLocaleDateString() } });
+      dispatch({
+        type: 'SAVE_QUIZ_RESULT',
+        payload: { title: quiz.title, score, date: new Date().toLocaleDateString() },
+      });
+
+      // Submit to backend
+      try {
+        await API.post(`/roadmaps/${id}/quiz/submit`, { answers });
+        if (fetchDashboardData) fetchDashboardData();
+      } catch (e) {
+        console.warn('Quiz submit sync note:', e.message);
+      }
+
       setPhase('results');
     } else {
       setCurrent(c => c + 1);
     }
   };
+
 
   const handleRetry = () => {
     setPhase('quiz');

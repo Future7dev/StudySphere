@@ -39,26 +39,133 @@ function VideoCard({ video, isActive, onClick }) {
 export default function TopicDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { dispatch } = useApp();
+  const { state, dispatch, trackTopicProgress } = useApp();
 
-  // Try to find topic by id (check if it's a known key or fall back to javascript)
-  const topic = topicDetails[id] || topicDetails['javascript'];
-  const [activeVideo, setActiveVideo] = useState(null);
+  // Dynamically resolve topic from generated roadmaps or mockData
+  const topic = React.useMemo(() => {
+    if (topicDetails[id]) return topicDetails[id];
+
+    // Search in all loaded roadmaps
+    for (const rm of state.roadmaps || []) {
+      for (const node of rm.nodes || []) {
+        if (node.id === id) {
+          const rawArticles = (node.subtopics || []).flatMap(s => s.articles || []);
+          const resList = rawArticles.map((a, idx) => ({
+            id: `res-${idx + 1}`,
+            title: typeof a === 'string' ? `${node.title} Reference ${idx + 1}` : a.title,
+            url: typeof a === 'string' ? a : a.url,
+            type: 'article',
+            description: typeof a === 'string' ? 'Curated Learning Resource' : (a.source || 'Reference Guide'),
+          }));
+
+          return {
+            id: node.id,
+            title: node.title,
+            description: node.definition || `Mastery section for ${node.title}`,
+            roadmapSlug: rm.slug || rm._id,
+            videos: (node.subtopics || [])
+              .filter(s => s.video && s.video.youtubeId)
+              .map(s => ({
+                id: s.id,
+                title: s.video.title || s.title,
+                channel: s.video.channel || 'Curated Tutorial',
+                duration: s.video.duration || '15:00',
+                youtubeId: s.video.youtubeId,
+                thumbnail: s.video.thumbnail,
+              })),
+            resources: resList,
+            articles: resList,
+            subtopics: (node.subtopics || []).map(s => ({
+              id: s.id,
+              title: s.title,
+              duration: '30m',
+              status: state.topicProgress[s.id] || s.status || 'not-started',
+              keyTakeaway: s.definition || `Key concepts of ${s.title}`,
+            })),
+          };
+        }
+
+        // Check subtopics
+        for (const sub of node.subtopics || []) {
+          if (sub.id === id) {
+            const resList = (sub.articles || []).map((a, idx) => ({
+              id: `res-${idx + 1}`,
+              title: typeof a === 'string' ? `${sub.title} Guide ${idx + 1}` : a.title,
+              url: typeof a === 'string' ? a : a.url,
+              type: 'article',
+              description: typeof a === 'string' ? 'Curated Reference Resource' : (a.source || 'Reference Guide'),
+            }));
+
+            return {
+              id: sub.id,
+              title: sub.title,
+              description: sub.definition || `In-depth tutorial for ${sub.title}`,
+              roadmapSlug: rm.slug || rm._id,
+              videos: sub.video ? [{
+                id: sub.id,
+                title: sub.video.title || `${sub.title} Video`,
+                channel: sub.video.channel || 'Curated Lecture',
+                duration: sub.video.duration || '15:00',
+                youtubeId: sub.video.youtubeId || '0_J3G1uBvhA',
+                thumbnail: sub.video.thumbnail,
+              }] : [],
+              resources: resList,
+              articles: resList,
+              subtopics: (sub.items || []).map(it => ({
+                id: it.id,
+                title: it.title,
+                duration: '20m',
+                status: state.topicProgress[it.id] || it.status || 'not-started',
+                keyTakeaway: `Mastery point for ${it.title}`,
+              })),
+            };
+          }
+        }
+      }
+    }
+
+    return topicDetails['javascript'];
+  }, [id, state.roadmaps, state.topicProgress]);
+
+
+  const [activeVideo, setActiveVideo] = useState(() => (topic.videos && topic.videos[0]) || null);
   const [expandedSub, setExpandedSub] = useState(null);
-  const [completedSubs, setCompletedSubs] = useState(
-    new Set(topic.subtopics.filter(s => s.status === 'completed').map(s => s.id))
-  );
+  const [completedSubs, setCompletedSubs] = useState(() => {
+    return new Set(
+      (topic.subtopics || [])
+        .filter(s => state.topicProgress[s.id] === 'completed' || s.status === 'completed')
+        .map(s => s.id)
+    );
+  });
 
-  const progressPct = Math.round((completedSubs.size / topic.subtopics.length) * 100);
+  React.useEffect(() => {
+    if (topic.videos && topic.videos.length > 0 && !activeVideo) {
+      setActiveVideo(topic.videos[0]);
+    }
+  }, [topic]);
 
-  const toggleSubComplete = (subId) => {
+  const progressPct = topic.subtopics && topic.subtopics.length > 0
+    ? Math.round((completedSubs.size / topic.subtopics.length) * 100)
+    : 0;
+
+  const toggleSubComplete = async (subId) => {
+    const isDone = completedSubs.has(subId);
+    const newStatus = isDone ? 'not-started' : 'completed';
+
     setCompletedSubs(prev => {
       const next = new Set(prev);
-      if (next.has(subId)) next.delete(subId); else next.add(subId);
+      if (isDone) next.delete(subId); else next.add(subId);
       return next;
     });
-    dispatch({ type: 'MARK_TOPIC', payload: { id: subId, status: completedSubs.has(subId) ? 'not-started' : 'completed' } });
+
+    dispatch({ type: 'MARK_TOPIC', payload: { id: subId, status: newStatus } });
+
+    if (trackTopicProgress) {
+      const rmId = topic.roadmapSlug || id;
+      await trackTopicProgress(rmId, subId, newStatus);
+    }
   };
+
 
   return (
     <div className="page-layout">
@@ -114,44 +221,49 @@ export default function TopicDetail() {
               )}
 
               {/* Video list */}
-              <div className="tp-section-header">
-                <h2 className="tp-section-title">Videos</h2>
-                <span className="tp-section-count">{topic.videos.length} curated</span>
-              </div>
-              <div className="tp-video-list">
-                {topic.videos.map(v => (
-                  <VideoCard
-                    key={v.id}
-                    video={v}
-                    isActive={activeVideo?.id === v.id}
-                    onClick={() => setActiveVideo(v)}
-                  />
-                ))}
-              </div>
+              {topic.videos && topic.videos.length > 0 && (
+                <>
+                  <div className="tp-section-header">
+                    <h2 className="tp-section-title">Videos</h2>
+                    <span className="tp-section-count">{topic.videos.length} curated</span>
+                  </div>
+                  <div className="tp-video-list">
+                    {topic.videos.map(v => (
+                      <VideoCard
+                        key={v.id}
+                        video={v}
+                        isActive={activeVideo?.id === v.id}
+                        onClick={() => setActiveVideo(v)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
 
               {/* Resources */}
               <div className="tp-section-header" style={{ marginTop: 'var(--space-8)' }}>
                 <h2 className="tp-section-title">Resources</h2>
-                <span className="tp-section-count">{topic.resources.length} links</span>
+                <span className="tp-section-count">{(topic.resources || topic.articles || []).length} links</span>
               </div>
               <div className="tp-resources">
-                {topic.resources.map(r => {
+                {(topic.resources || topic.articles || []).map(r => {
                   const cfg = resourceTypeConfig[r.type] || resourceTypeConfig.article;
                   const Icon = cfg.icon;
                   return (
-                    <a key={r.id} href={r.url} target="_blank" rel="noopener noreferrer" className="tp-resource card card-interactive">
+                    <a key={r.id || r.url} href={r.url} target="_blank" rel="noopener noreferrer" className="tp-resource card card-interactive">
                       <div className="tp-resource-icon" style={{ background: `${cfg.color}15`, color: cfg.color }}>
                         <Icon size={16} strokeWidth={1.5} />
                       </div>
                       <div className="tp-resource-info">
                         <div className="tp-resource-title">{r.title}</div>
-                        <div className="tp-resource-desc">{r.description}</div>
+                        <div className="tp-resource-desc">{r.description || 'Curated reference guide'}</div>
                       </div>
                       <ExternalLink size={13} className="tp-resource-ext" />
                     </a>
                   );
                 })}
               </div>
+
             </div>
 
             {/* Right: Subtopics */}

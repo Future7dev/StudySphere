@@ -7,3 +7,5 @@ langchain_google_genai
 pydantic
 requests
 jupyter
+tavily
+google-api-python-client
