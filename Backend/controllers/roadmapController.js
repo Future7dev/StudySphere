@@ -124,6 +124,7 @@ function formatNotebookRoadmap(notebookData, requestedTopic) {
   const quiz = {
     id: `${slug}-quiz`,
     title: `${title} Section Mastery Quiz`,
+    topicId: slug,
     timePerQuestion: 30,
     questions,
   };
@@ -411,7 +412,12 @@ export const getRoadmapQuiz = async (req, res) => {
   try {
     const { id } = req.params;
     const roadmap = await Roadmap.findOne({
-      $or: [{ _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null }, { slug: id }],
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { slug: id },
+        { "nodes.id": id },
+        { "nodes.subtopics.id": id },
+      ],
     }).lean();
 
     if (!roadmap || !roadmap.quiz) {
@@ -431,7 +437,12 @@ export const submitQuiz = async (req, res) => {
     const { answers } = req.body;
 
     const roadmap = await Roadmap.findOne({
-      $or: [{ _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null }, { slug: id }],
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { slug: id },
+        { "nodes.id": id },
+        { "nodes.subtopics.id": id },
+      ],
     });
 
     if (!roadmap || !roadmap.quiz || !roadmap.quiz.questions) {
@@ -532,5 +543,53 @@ export const getDashboardSummary = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE /api/roadmaps/:id
+export const deleteRoadmap = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const roadmap = await Roadmap.findOne({
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { slug: id },
+      ],
+    });
+
+    if (req.user) {
+      if (roadmap) {
+        await Progress.deleteMany({
+          userId: req.user._id,
+          $or: [{ roadmapId: roadmap._id }, { roadmapSlug: roadmap.slug }],
+        });
+
+        // If the user created this roadmap, remove it from the collection as well
+        if (roadmap.userId && roadmap.userId.toString() === req.user._id.toString()) {
+          await Roadmap.findByIdAndDelete(roadmap._id);
+        }
+      } else {
+        await Progress.deleteMany({
+          userId: req.user._id,
+          roadmapSlug: id,
+        });
+      }
+    } else if (roadmap) {
+      // Unauthenticated / local fallback: if user is mock, delete by roadmap ID if matched
+      if (!roadmap.userId) {
+        await Progress.deleteMany({
+          $or: [{ roadmapId: roadmap._id }, { roadmapSlug: roadmap.slug }],
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Syllabus deleted successfully.",
+    });
+  } catch (error) {
+    console.error("deleteRoadmap error:", error);
+    res.status(500).json({ message: error.message || "Failed to delete syllabus." });
   }
 };
