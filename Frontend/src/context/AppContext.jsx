@@ -78,6 +78,14 @@ function reducer(state, action) {
           ...state.uploadedSyllabi.filter(s => s.id !== action.payload.id),
         ],
       };
+    case 'DELETE_SYLLABUS':
+      return {
+        ...state,
+        uploadedSyllabi: state.uploadedSyllabi.filter(s => s.id !== action.payload),
+        roadmaps: (state.roadmaps || []).filter(
+          r => r.id !== action.payload && r.slug !== action.payload && r._id !== action.payload
+        ),
+      };
     case 'UPDATE_SYLLABUS_PROGRESS':
       return {
         ...state,
@@ -144,8 +152,18 @@ export function AppProvider({ children }) {
     }
   };
 
+  // Delete a syllabus and its progress
+  const deleteSyllabus = async (id) => {
+    dispatch({ type: 'DELETE_SYLLABUS', payload: id });
+    try {
+      await API.delete(`/roadmaps/${id}`);
+    } catch (err) {
+      console.warn('Delete syllabus API sync note:', err.message);
+    }
+  };
+
   return (
-    <AppContext.Provider value={{ state, dispatch, trackTopicProgress, fetchDashboardData }}>
+    <AppContext.Provider value={{ state, dispatch, trackTopicProgress, fetchDashboardData, deleteSyllabus }}>
       {children}
     </AppContext.Provider>
   );
