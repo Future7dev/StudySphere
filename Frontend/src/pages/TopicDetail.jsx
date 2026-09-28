@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, Circle, Loader, Play, ExternalLink, BookOpen, 
 import { useApp } from '../context/AppContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { topicDetails } from '../data/mockData';
+import { topicDetails, quizzes } from '../data/mockData';
 import './TopicDetail.css';
 
 const resourceTypeConfig = {
@@ -167,6 +167,8 @@ export default function TopicDetail() {
   };
 
 
+  const quizTargetId = topic.roadmapSlug || topic.roadmapId || (quizzes[topic.id] ? topic.id : (quizzes[id] ? id : id));
+
   return (
     <div className="page-layout">
       <Navbar />
@@ -189,7 +191,7 @@ export default function TopicDetail() {
                 <span className="tp-pct">{progressPct}% complete</span>
               </div>
             </div>
-            <Link to={`/quiz/${id}`} className="btn btn-primary tp-quiz-btn">
+            <Link to={`/quiz/${quizTargetId}`} className="btn btn-primary tp-quiz-btn">
               <Brain size={15} /> Take quiz
             </Link>
           </div>
@@ -312,7 +314,7 @@ export default function TopicDetail() {
                   </div>
                   <span className="tp-pw-pct">{progressPct}%</span>
                 </div>
-                <Link to={`/quiz/${id}`} className="btn btn-primary btn-sm tp-quiz-side">
+                <Link to={`/quiz/${quizTargetId}`} className="btn btn-primary btn-sm tp-quiz-side">
                   <Brain size={13} /> Take the quiz
                 </Link>
               </div>
