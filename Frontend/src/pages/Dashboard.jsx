@@ -43,7 +43,11 @@ export default function Dashboard() {
     if (!syllabusToDelete) return;
     setIsDeleting(true);
     try {
-      await deleteSyllabus(syllabusToDelete.id);
+      const targetId = syllabusToDelete.id || syllabusToDelete.slug || syllabusToDelete._id;
+      await deleteSyllabus(targetId);
+      if (syllabusToDelete.slug && syllabusToDelete.slug !== targetId) {
+        await deleteSyllabus(syllabusToDelete.slug);
+      }
     } finally {
       setIsDeleting(false);
       setSyllabusToDelete(null);
