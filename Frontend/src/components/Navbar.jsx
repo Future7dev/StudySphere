@@ -25,7 +25,7 @@ export default function Navbar() {
 
   return (
     <header className="navbar">
-      <div className="navbar-inner container">
+      <div className="navbar-inner">
         {/* Logo */}
         <Link to={state.isAuthenticated ? '/dashboard' : '/'} className="navbar-logo">
           <div className="navbar-logo-icon">
