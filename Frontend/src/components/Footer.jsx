@@ -29,7 +29,7 @@ export default function Footer() {
           <div className="footer-brand">
             <Link to="/" className="footer-logo">
               <div className="footer-logo-icon"><Zap size={14} strokeWidth={2.5} /></div>
-              <span>StudySphere</span>
+              <span className="footer-logo-text">StudySphere</span>
             </Link>
             <p className="footer-tagline">
               Turn any syllabus into a structured learning journey.

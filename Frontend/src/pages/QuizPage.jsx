@@ -62,12 +62,22 @@ export default function QuizPage() {
   const navigate = useNavigate();
   const { state, dispatch, fetchDashboardData } = useApp();
 
+  const resolveRoadmap = (targetId) => {
+    let rm = (state.roadmaps || []).find(r => r.slug === targetId || r.id === targetId || r._id === targetId);
+    if (!rm) {
+      rm = (state.roadmaps || []).find(r =>
+        (r.nodes || []).some(n => n.id === targetId || (n.subtopics || []).some(s => s.id === targetId))
+      );
+    }
+    return rm;
+  };
+
   const [quiz, setQuiz] = useState(() => {
-    const rm = (state.roadmaps || []).find(r => r.slug === id || r.id === id || r._id === id);
+    const rm = resolveRoadmap(id);
     if (rm && rm.quiz && rm.quiz.questions && rm.quiz.questions.length > 0) {
       return rm.quiz;
     }
-    return quizzes[id] || quizzes['javascript'];
+    return quizzes[id] || (rm?.slug && quizzes[rm.slug]) || quizzes['javascript'];
   });
 
   const [phase, setPhase] = useState('quiz'); // 'quiz' | 'results'
@@ -82,7 +92,9 @@ export default function QuizPage() {
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const res = await API.get(`/roadmaps/${id}/quiz`);
+        const rm = resolveRoadmap(id);
+        const targetId = rm?.slug || rm?._id || id;
+        const res = await API.get(`/roadmaps/${targetId}/quiz`);
         if (res.data && res.data.questions && res.data.questions.length > 0) {
           setQuiz(res.data);
           setAnswers(new Array(res.data.questions.length).fill(null));
@@ -93,7 +105,7 @@ export default function QuizPage() {
       }
     };
     fetchQuiz();
-  }, [id]);
+  }, [id, state.roadmaps]);
 
   const q = quiz.questions[current] || quiz.questions[0];
   const isLastQuestion = current === quiz.questions.length - 1;
@@ -176,7 +188,15 @@ export default function QuizPage() {
               quiz={quiz}
               answers={answers}
               onRetry={handleRetry}
-              onContinue={() => navigate(`/topic/${quiz.topicId}`)}
+              onContinue={() => {
+                const rm = resolveRoadmap(id);
+                const targetSlug = rm?.slug || rm?._id || quiz.topicId;
+                if (targetSlug) {
+                  navigate(`/roadmap/${targetSlug}`);
+                } else {
+                  navigate(-1);
+                }
+              }}
             />
           </div>
         </main>

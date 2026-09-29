@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 import Roadmap from "../model/Roadmap.js";
-
 import Progress from "../model/Progress.js";
 import User from "../model/User.js";
 
@@ -124,6 +124,7 @@ function formatNotebookRoadmap(notebookData, requestedTopic) {
   const quiz = {
     id: `${slug}-quiz`,
     title: `${title} Section Mastery Quiz`,
+    topicId: slug,
     timePerQuestion: 30,
     questions,
   };
@@ -411,7 +412,12 @@ export const getRoadmapQuiz = async (req, res) => {
   try {
     const { id } = req.params;
     const roadmap = await Roadmap.findOne({
-      $or: [{ _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null }, { slug: id }],
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { slug: id },
+        { "nodes.id": id },
+        { "nodes.subtopics.id": id },
+      ],
     }).lean();
 
     if (!roadmap || !roadmap.quiz) {
@@ -431,7 +437,12 @@ export const submitQuiz = async (req, res) => {
     const { answers } = req.body;
 
     const roadmap = await Roadmap.findOne({
-      $or: [{ _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null }, { slug: id }],
+      $or: [
+        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
+        { slug: id },
+        { "nodes.id": id },
+        { "nodes.subtopics.id": id },
+      ],
     });
 
     if (!roadmap || !roadmap.quiz || !roadmap.quiz.questions) {
@@ -532,5 +543,75 @@ export const getDashboardSummary = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE /api/roadmaps/:id
+export const deleteRoadmap = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Syllabus ID is required." });
+    }
+
+    const conditions = [{ slug: id }];
+    if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+      conditions.push({ _id: id });
+    }
+
+    const roadmap = await Roadmap.findOne({ $or: conditions });
+
+    if (roadmap) {
+      const progressConditions = [
+        { roadmapId: roadmap._id },
+        { roadmapSlug: roadmap.slug },
+        { roadmapSlug: id },
+      ];
+      if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+        progressConditions.push({ roadmapId: id });
+      }
+
+      if (req.user) {
+        await Progress.deleteMany({
+          userId: req.user._id,
+          $or: progressConditions,
+        });
+
+        // If the user created this roadmap or it has no owner, delete all its progress & remove roadmap
+        if (!roadmap.userId || roadmap.userId.toString() === req.user._id.toString()) {
+          await Progress.deleteMany({ $or: progressConditions });
+          await Roadmap.findByIdAndDelete(roadmap._id);
+        }
+      } else {
+        // Unauthenticated / local fallback
+        if (!roadmap.userId) {
+          await Progress.deleteMany({ $or: progressConditions });
+          await Roadmap.findByIdAndDelete(roadmap._id);
+        }
+      }
+    } else {
+      // If roadmap was already removed or only progress remains
+      const progressConditions = [{ roadmapSlug: id }];
+      if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+        progressConditions.push({ roadmapId: id });
+      }
+
+      if (req.user) {
+        await Progress.deleteMany({
+          userId: req.user._id,
+          $or: progressConditions,
+        });
+      } else {
+        await Progress.deleteMany({ $or: progressConditions });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Syllabus deleted successfully.",
+    });
+  } catch (error) {
+    console.error("deleteRoadmap error:", error);
+    res.status(500).json({ message: error.message || "Failed to delete syllabus." });
   }
 };
