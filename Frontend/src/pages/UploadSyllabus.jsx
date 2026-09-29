@@ -139,9 +139,17 @@ export default function UploadSyllabus() {
         <div className="container container-sm">
           {/* Header */}
           <div className="upload-header">
-            <h1 className="upload-title font-display">Upload your syllabus</h1>
+            <div className="upload-eyebrow">
+              <Sparkles size={11} />
+              AI-Powered Roadmap Generator
+            </div>
+            <h1 className="upload-title font-display">
+              Upload your syllabus,
+              <br />
+              <span className="upload-title-highlight">get a roadmap</span>
+            </h1>
             <p className="upload-sub">
-              Drop a PDF, DOCX, or TXT file — or type a topic name. We'll generate a complete learning roadmap instantly.
+              Drop a PDF, DOCX, or TXT file — or type a topic name. We'll generate a complete learning roadmap in seconds.
             </p>
           </div>
 

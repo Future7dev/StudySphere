@@ -1,4 +1,5 @@
-/* ─── Upload Syllabus ───────────────────────────────────────────────────────── */
+/* ─── Upload Syllabus v3 ─────────────────────────────────────────────────────── */
+
 .upload-page {
   flex: 1;
   padding: var(--space-12) 0 var(--space-20);
@@ -6,68 +7,105 @@
 
 .upload-header {
   text-align: center;
-  margin-bottom: var(--space-8);
+  margin-bottom: var(--space-10);
 }
+
+.upload-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--primary-light);
+  margin-bottom: var(--space-5);
+}
+
 .upload-title {
-  font-size: var(--text-4xl);
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-3xl), 4vw, var(--text-5xl));
   font-weight: 800;
   color: var(--text-1);
-  letter-spacing: -0.03em;
-  margin-bottom: var(--space-3);
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  margin-bottom: var(--space-4);
 }
+
+.upload-title-highlight {
+  background: linear-gradient(135deg, var(--primary-light) 0%, var(--cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .upload-sub {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
   color: var(--text-2);
   max-width: 480px;
   margin: 0 auto;
   line-height: 1.7;
 }
 
+/* Content wrapper */
+.upload-content-wrap {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
 /* Tabs */
 .upload-tabs {
   display: flex;
-  gap: var(--space-2);
+  gap: 4px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   padding: 4px;
   margin-bottom: var(--space-5);
 }
+
 .upload-tab {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: 9px;
-  border-radius: var(--radius-md);
+  padding: 10px;
+  border-radius: var(--radius-lg);
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--text-2);
-  transition: all var(--transition);
+  transition: all var(--transition-md);
+  cursor: pointer;
 }
 .upload-tab:hover { color: var(--text-1); }
 .upload-tab.active {
-  background: var(--bg);
-  color: var(--text-1);
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-sm);
+  background: var(--primary-dim);
+  color: var(--primary-light);
+  border: 1px solid var(--primary-border);
 }
 
 /* Card */
 .upload-card {
-  padding: var(--space-6);
+  padding: var(--space-7);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   margin-bottom: var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-2xl);
 }
 
 /* Drop Zone */
 .drop-zone {
   border: 1.5px dashed var(--border-2);
-  border-radius: var(--radius-xl);
-  padding: var(--space-12) var(--space-8);
+  border-radius: var(--radius-2xl);
+  padding: var(--space-16) var(--space-8);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -77,47 +115,52 @@
   text-align: center;
   background: var(--bg-1);
 }
+
 .drop-zone:hover, .drop-zone.dragging {
   border-color: var(--primary);
   background: var(--primary-dim);
 }
+
 .drop-zone.has-file {
   border-style: solid;
-  border-color: rgba(52,211,153,0.3);
+  border-color: rgba(16,185,129,0.3);
   background: var(--success-dim);
   cursor: default;
   padding: var(--space-5);
 }
 
 .drop-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-xl);
+  width: 60px;
+  height: 60px;
+  border-radius: var(--radius-2xl);
   background: var(--surface);
   border: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--primary);
-  transition: all var(--transition);
+  transition: all var(--transition-md);
 }
 .drop-zone:hover .drop-icon, .drop-zone.dragging .drop-icon {
   background: var(--primary-dim);
-  border-color: rgba(91,95,237,0.3);
+  border-color: var(--primary-border);
+  transform: scale(1.05);
 }
 
-.drop-text { display: flex; flex-direction: column; gap: 4px; }
+.drop-text { display: flex; flex-direction: column; gap: 5px; }
 .drop-main {
   font-size: var(--text-base);
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-1);
+  font-family: var(--font-display);
 }
 .drop-sub { font-size: var(--text-sm); color: var(--text-2); }
-.drop-browse { color: var(--primary); font-weight: 600; }
+.drop-browse { color: var(--primary-light); font-weight: 700; }
 .drop-formats {
   font-size: var(--text-xs);
   color: var(--text-3);
   letter-spacing: 0.04em;
+  font-weight: 500;
 }
 
 /* File preview */
@@ -127,11 +170,12 @@
   gap: var(--space-4);
   width: 100%;
 }
+
 .file-preview-icon {
   width: 44px;
   height: 44px;
   background: var(--success-dim);
-  border: 1px solid rgba(52,211,153,0.2);
+  border: 1px solid rgba(16,185,129,0.2);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
@@ -139,6 +183,7 @@
   color: var(--success);
   flex-shrink: 0;
 }
+
 .file-preview-info {
   flex: 1;
   min-width: 0;
@@ -146,6 +191,7 @@
   flex-direction: column;
   gap: 2px;
 }
+
 .file-preview-name {
   font-size: var(--text-sm);
   font-weight: 600;
@@ -154,10 +200,9 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.file-preview-size {
-  font-size: var(--text-xs);
-  color: var(--text-3);
-}
+
+.file-preview-size { font-size: var(--text-xs); color: var(--text-3); }
+
 .file-remove-btn {
   display: flex;
   align-items: center;
@@ -175,15 +220,14 @@
   flex-direction: column;
   gap: var(--space-3);
 }
+
 .topic-textarea {
   resize: vertical;
-  min-height: 100px;
-  line-height: 1.6;
+  min-height: 110px;
+  line-height: 1.7;
 }
-.topic-hint {
-  font-size: var(--text-xs);
-  color: var(--text-3);
-}
+
+.topic-hint { font-size: var(--text-xs); color: var(--text-3); }
 
 .topic-samples {
   display: flex;
@@ -191,26 +235,29 @@
   align-items: center;
   gap: var(--space-2);
 }
+
 .topic-samples-label {
   font-size: var(--text-xs);
   color: var(--text-3);
   font-weight: 500;
 }
+
 .topic-sample-chip {
-  padding: 4px 12px;
+  padding: 5px 13px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius-full);
   font-size: var(--text-xs);
   font-weight: 500;
   color: var(--text-2);
-  transition: all var(--transition);
+  transition: all var(--transition-md);
   cursor: pointer;
 }
 .topic-sample-chip:hover {
-  border-color: var(--primary);
-  color: var(--primary);
+  border-color: var(--primary-border);
+  color: var(--primary-light);
   background: var(--primary-dim);
+  transform: translateY(-1px);
 }
 
 /* Error */
@@ -218,10 +265,10 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 10px var(--space-4);
+  padding: 12px var(--space-4);
   background: var(--error-dim);
-  border: 1px solid rgba(248,113,113,0.2);
-  border-radius: var(--radius-md);
+  border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-lg);
   font-size: var(--text-sm);
   color: var(--error);
 }
@@ -230,37 +277,46 @@
 .upload-cta {
   justify-content: center;
   gap: var(--space-2);
+  width: 100%;
 }
 
-/* How it works */
+/* How it works mini */
 .upload-how {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-8);
+  padding: var(--space-5) var(--space-6);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
 }
+
 .upload-how-item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
 }
+
 .upload-how-step {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--primary-dim);
+  border: 1px solid var(--primary-border);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 11px;
-  font-weight: 700;
-  color: var(--primary);
+  font-weight: 800;
+  color: var(--primary-light);
   flex-shrink: 0;
+  font-family: var(--font-display);
 }
+
 .upload-how-text {
   font-size: var(--text-xs);
-  color: var(--text-3);
+  color: var(--text-2);
   font-weight: 500;
 }
 
