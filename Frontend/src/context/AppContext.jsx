@@ -4,6 +4,47 @@ import API from '../api/axios';
 
 const AppContext = createContext(null);
 
+const defaultSyllabi = [
+  { id: 'web-dev', title: 'Full-Stack Web Development', uploadedAt: '2026-08-10', progress: 42 },
+  { id: 'ml-ai',  title: 'Machine Learning & AI',      uploadedAt: '2026-08-15', progress: 28 },
+  { id: 'dsa',    title: 'Data Structures & Algorithms',uploadedAt: '2026-08-20', progress: 35 },
+];
+
+const getDeletedSyllabi = () => {
+  try {
+    const raw = localStorage.getItem('deletedSyllabi');
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
+
+const saveDeletedSyllabi = (ids) => {
+  try {
+    localStorage.setItem('deletedSyllabi', JSON.stringify(ids));
+  } catch (err) {
+    console.error('Failed to save deletedSyllabi:', err);
+  }
+};
+
+const getSavedSyllabi = () => {
+  try {
+    const raw = localStorage.getItem('uploadedSyllabi');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch {}
+  return null;
+};
+
+const saveUploadedSyllabi = (syllabi) => {
+  try {
+    localStorage.setItem('uploadedSyllabi', JSON.stringify(syllabi));
+  } catch (err) {
+    console.error('Failed to save uploadedSyllabi:', err);
+  }
+};
 
 const savedUser = (() => {
   try {
@@ -15,10 +56,20 @@ const savedUser = (() => {
 })();
 const hasToken = !!localStorage.getItem('token');
 
+const initialDeleted = getDeletedSyllabi();
+const savedSyllabi = getSavedSyllabi();
+const baseSyllabi = savedSyllabi !== null ? savedSyllabi : defaultSyllabi;
+const initialUploadedSyllabi = baseSyllabi.filter(
+  s => !initialDeleted.includes(s.id) && !initialDeleted.includes(s.slug) && !initialDeleted.includes(s._id)
+);
+const initialRoadmaps = roadmaps.filter(
+  r => !initialDeleted.includes(r.id) && !initialDeleted.includes(r.slug) && !initialDeleted.includes(r._id)
+);
+
 const initialState = {
   user: savedUser ? { ...userProfile, ...savedUser } : userProfile,
   isAuthenticated: hasToken,
-  roadmaps: roadmaps,
+  roadmaps: initialRoadmaps,
   topicProgress: {
     'html-basics': 'completed', 'css-basics': 'completed',
     'flexbox': 'completed', 'responsive': 'completed',
@@ -33,11 +84,7 @@ const initialState = {
     'array-basics': 'completed', 'two-pointer': 'completed', 'sliding-window': 'completed',
     'll-basics': 'completed', 'll-ops': 'in-progress',
   },
-  uploadedSyllabi: [
-    { id: 'web-dev', title: 'Full-Stack Web Development', uploadedAt: '2026-08-10', progress: 42 },
-    { id: 'ml-ai',  title: 'Machine Learning & AI',      uploadedAt: '2026-08-15', progress: 28 },
-    { id: 'dsa',    title: 'Data Structures & Algorithms',uploadedAt: '2026-08-20', progress: 35 },
-  ],
+  uploadedSyllabi: initialUploadedSyllabi,
   quizResults: [],
 };
 
@@ -48,11 +95,24 @@ function reducer(state, action) {
     case 'LOGOUT':
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      return { ...state, isAuthenticated: false, user: userProfile };
+      localStorage.removeItem('uploadedSyllabi');
+      localStorage.removeItem('deletedSyllabi');
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: userProfile,
+        uploadedSyllabi: defaultSyllabi,
+        roadmaps: roadmaps,
+      };
     case 'SIGNUP':
       return { ...state, isAuthenticated: true, user: { ...state.user, ...action.payload } };
-    case 'SET_ROADMAPS':
-      return { ...state, roadmaps: action.payload };
+    case 'SET_ROADMAPS': {
+      const currentDeleted = getDeletedSyllabi();
+      const filtered = (action.payload || []).filter(
+        r => !currentDeleted.includes(r.id) && !currentDeleted.includes(r.slug) && !currentDeleted.includes(r._id)
+      );
+      return { ...state, roadmaps: filtered };
+    }
     case 'ADD_ROADMAP':
       return {
         ...state,
@@ -70,36 +130,74 @@ function reducer(state, action) {
         ...state,
         topicProgress: { ...state.topicProgress, ...action.payload },
       };
-    case 'ADD_SYLLABUS':
+    case 'SET_SYLLABI': {
+      const currentDeleted = getDeletedSyllabi();
+      const filtered = (action.payload || []).filter(
+        s => !currentDeleted.includes(s.id) && !currentDeleted.includes(s.slug) && !currentDeleted.includes(s._id)
+      );
+      saveUploadedSyllabi(filtered);
       return {
         ...state,
-        uploadedSyllabi: [
-          action.payload,
-          ...state.uploadedSyllabi.filter(s => s.id !== action.payload.id),
-        ],
+        uploadedSyllabi: filtered,
       };
-    case 'DELETE_SYLLABUS':
+    }
+    case 'ADD_SYLLABUS': {
+      const sId = action.payload.id || action.payload.slug;
+      const currentDeleted = getDeletedSyllabi();
+      if (currentDeleted.includes(sId) || currentDeleted.includes(action.payload.id) || currentDeleted.includes(action.payload.slug)) {
+        const filteredDeleted = currentDeleted.filter(
+          id => id !== sId && id !== action.payload.id && id !== action.payload.slug
+        );
+        saveDeletedSyllabi(filteredDeleted);
+      }
+      const updatedSyllabi = [
+        action.payload,
+        ...state.uploadedSyllabi.filter(s => s.id !== action.payload.id && s.id !== sId),
+      ];
+      saveUploadedSyllabi(updatedSyllabi);
       return {
         ...state,
-        uploadedSyllabi: state.uploadedSyllabi.filter(s => s.id !== action.payload),
-        roadmaps: (state.roadmaps || []).filter(
-          r => r.id !== action.payload && r.slug !== action.payload && r._id !== action.payload
-        ),
+        uploadedSyllabi: updatedSyllabi,
       };
-    case 'UPDATE_SYLLABUS_PROGRESS':
+    }
+    case 'DELETE_SYLLABUS': {
+      const target = action.payload;
+      const currentDeleted = getDeletedSyllabi();
+      if (!currentDeleted.includes(target)) {
+        currentDeleted.push(target);
+        saveDeletedSyllabi(currentDeleted);
+      }
+      const updatedSyllabi = state.uploadedSyllabi.filter(
+        s => s.id !== target && s.slug !== target && s._id !== target
+      );
+      saveUploadedSyllabi(updatedSyllabi);
+      const updatedRoadmaps = (state.roadmaps || []).filter(
+        r => r.id !== target && r.slug !== target && r._id !== target
+      );
       return {
         ...state,
-        uploadedSyllabi: state.uploadedSyllabi.map(s =>
-          s.id === action.payload.id ? { ...s, progress: action.payload.progress } : s
-        ),
+        uploadedSyllabi: updatedSyllabi,
+        roadmaps: updatedRoadmaps,
       };
+    }
+    case 'UPDATE_SYLLABUS_PROGRESS': {
+      const updatedSyllabi = state.uploadedSyllabi.map(s =>
+        s.id === action.payload.id || s.slug === action.payload.id
+          ? { ...s, progress: action.payload.progress }
+          : s
+      );
+      saveUploadedSyllabi(updatedSyllabi);
+      return {
+        ...state,
+        uploadedSyllabi: updatedSyllabi,
+      };
+    }
     case 'SAVE_QUIZ_RESULT':
       return { ...state, quizResults: [action.payload, ...state.quizResults] };
     default:
       return state;
   }
 }
-
 
 export function AppProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -108,22 +206,38 @@ export function AppProvider({ children }) {
   const fetchDashboardData = async () => {
     try {
       const token = localStorage.getItem('token');
+      const currentDeleted = getDeletedSyllabi();
+
       if (token) {
         const res = await API.get('/roadmaps/user/dashboard-summary');
-        if (res.data.syllabi && res.data.syllabi.length > 0) {
-          res.data.syllabi.forEach(s => {
-            dispatch({ type: 'ADD_SYLLABUS', payload: s });
-          });
-        }
-        if (res.data.user) {
-          dispatch({ type: 'SET_USER_DATA', payload: res.data.user });
+        if (res.data) {
+          if (Array.isArray(res.data.syllabi)) {
+            const backendSyllabi = res.data.syllabi.filter(
+              s => !currentDeleted.includes(s.id) && !currentDeleted.includes(s.slug) && !currentDeleted.includes(s._id)
+            );
+
+            // Reconcile with non-deleted local/mock syllabi
+            const backendIds = new Set(backendSyllabi.map(s => s.id));
+            const existingNonDeleted = (getSavedSyllabi() || state.uploadedSyllabi).filter(
+              s => !currentDeleted.includes(s.id) && !currentDeleted.includes(s.slug) && !backendIds.has(s.id)
+            );
+
+            const merged = [...backendSyllabi, ...existingNonDeleted];
+            dispatch({ type: 'SET_SYLLABI', payload: merged });
+          }
+          if (res.data.user) {
+            dispatch({ type: 'SET_USER_DATA', payload: res.data.user });
+          }
         }
       }
 
       // Also fetch roadmaps from Express
       const rmRes = await API.get('/roadmaps');
       if (Array.isArray(rmRes.data) && rmRes.data.length > 0) {
-        dispatch({ type: 'SET_ROADMAPS', payload: rmRes.data });
+        const filteredRoadmaps = rmRes.data.filter(
+          r => !currentDeleted.includes(r.id) && !currentDeleted.includes(r.slug) && !currentDeleted.includes(r._id)
+        );
+        dispatch({ type: 'SET_ROADMAPS', payload: filteredRoadmaps });
       }
     } catch (err) {
       // Graceful fallback to initial mock state if backend not ready
@@ -154,9 +268,10 @@ export function AppProvider({ children }) {
 
   // Delete a syllabus and its progress
   const deleteSyllabus = async (id) => {
+    if (!id) return;
     dispatch({ type: 'DELETE_SYLLABUS', payload: id });
     try {
-      await API.delete(`/roadmaps/${id}`);
+      await API.delete(`/roadmaps/${encodeURIComponent(id)}`);
     } catch (err) {
       console.warn('Delete syllabus API sync note:', err.message);
     }
@@ -174,4 +289,3 @@ export function useApp() {
   if (!ctx) throw new Error('useApp must be inside AppProvider');
   return ctx;
 }
-
