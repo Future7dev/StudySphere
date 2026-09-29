@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoose from "mongoose";
 import Roadmap from "../model/Roadmap.js";
-
 import Progress from "../model/Progress.js";
 import User from "../model/User.js";
 
@@ -550,37 +550,59 @@ export const getDashboardSummary = async (req, res) => {
 export const deleteRoadmap = async (req, res) => {
   try {
     const { id } = req.params;
+    if (!id) {
+      return res.status(400).json({ message: "Syllabus ID is required." });
+    }
 
-    const roadmap = await Roadmap.findOne({
-      $or: [
-        { _id: id.match(/^[0-9a-fA-F]{24}$/) ? id : null },
-        { slug: id },
-      ],
-    });
+    const conditions = [{ slug: id }];
+    if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+      conditions.push({ _id: id });
+    }
 
-    if (req.user) {
-      if (roadmap) {
+    const roadmap = await Roadmap.findOne({ $or: conditions });
+
+    if (roadmap) {
+      const progressConditions = [
+        { roadmapId: roadmap._id },
+        { roadmapSlug: roadmap.slug },
+        { roadmapSlug: id },
+      ];
+      if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+        progressConditions.push({ roadmapId: id });
+      }
+
+      if (req.user) {
         await Progress.deleteMany({
           userId: req.user._id,
-          $or: [{ roadmapId: roadmap._id }, { roadmapSlug: roadmap.slug }],
+          $or: progressConditions,
         });
 
-        // If the user created this roadmap, remove it from the collection as well
-        if (roadmap.userId && roadmap.userId.toString() === req.user._id.toString()) {
+        // If the user created this roadmap or it has no owner, delete all its progress & remove roadmap
+        if (!roadmap.userId || roadmap.userId.toString() === req.user._id.toString()) {
+          await Progress.deleteMany({ $or: progressConditions });
           await Roadmap.findByIdAndDelete(roadmap._id);
         }
       } else {
+        // Unauthenticated / local fallback
+        if (!roadmap.userId) {
+          await Progress.deleteMany({ $or: progressConditions });
+          await Roadmap.findByIdAndDelete(roadmap._id);
+        }
+      }
+    } else {
+      // If roadmap was already removed or only progress remains
+      const progressConditions = [{ roadmapSlug: id }];
+      if (mongoose.Types.ObjectId.isValid(id) && id.length === 24) {
+        progressConditions.push({ roadmapId: id });
+      }
+
+      if (req.user) {
         await Progress.deleteMany({
           userId: req.user._id,
-          roadmapSlug: id,
+          $or: progressConditions,
         });
-      }
-    } else if (roadmap) {
-      // Unauthenticated / local fallback: if user is mock, delete by roadmap ID if matched
-      if (!roadmap.userId) {
-        await Progress.deleteMany({
-          $or: [{ roadmapId: roadmap._id }, { roadmapSlug: roadmap.slug }],
-        });
+      } else {
+        await Progress.deleteMany({ $or: progressConditions });
       }
     }
 
