@@ -5,6 +5,7 @@ import { useApp } from '../context/AppContext';
 import './Auth.css';
 import api from '../api/axios.js';
 import GoogleLoginButton from '../components/GoogleLoginButton';
+import GhostFibers from './GhostFibers';
 
 const STEPS = ['Account', 'Profile', 'Interests'];
 const INTERESTS = ['Web Development', 'Machine Learning', 'Data Structures', 'System Design', 'DevOps', 'Mobile Dev', 'Cybersecurity', 'Blockchain'];
@@ -58,6 +59,39 @@ export default function Signup() {
 
   return (
     <div className="auth-page">
+      {/* GhostFibers full-page background */}
+      <div className="auth-fibers-bg">
+        <GhostFibers
+          lineColor="#350e19"
+          glowColor="#a03454"
+          speed={0.2}
+          scale={2}
+          rotation={0}
+          rotationSpeed={0.25}
+          layers={4}
+          waveAmplitude={0.015}
+          waveFrequency={3}
+          waveSpeed={0.15}
+          layerSpeed={0.08}
+          twist={0.1}
+          twistFrequency={5}
+          twistSpeed={1.2}
+          lineFrequency={5}
+          lineSpacing={2}
+          lineSharpness={16}
+          glowFalloff={10}
+          glowIntensity={1.6}
+          brightness={2}
+          blueBoost={1.25}
+          vignette={0.8}
+          grain={0.05}
+          dpr={1}
+          lightMode={false}
+          fps={60}
+          paused={false}
+        />
+      </div>
+
       <div className="auth-left">
         <div className="auth-left-content">
           <Link to="/" className="auth-logo">
