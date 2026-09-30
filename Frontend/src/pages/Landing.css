@@ -104,11 +104,18 @@
   --my: 50%;
 }
 
-.hero-bg {
+/* GradientWaves fills the entire hero as a full-bleed background */
+.hero-gradient-waves-bg {
   position: absolute;
   inset: 0;
-  pointer-events: none;
   z-index: 0;
+  pointer-events: none; /* allow clicks to pass through to hero content */
+  overflow: hidden;
+}
+
+.hero-gradient-waves-bg > * {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .hero-bg-grid {
