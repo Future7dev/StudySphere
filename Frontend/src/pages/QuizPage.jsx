@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Clock, CheckCircle2, XCircle, ArrowRight, RotateCcw, Trophy } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import Navbar from '../components/Navbar';
-import { quizzes } from '../data/mockData';
 import './QuizPage.css';
 
 function ResultsScreen({ quiz, answers, onRetry, onContinue }) {
@@ -74,10 +73,9 @@ export default function QuizPage() {
 
   const [quiz, setQuiz] = useState(() => {
     const rm = resolveRoadmap(id);
-    if (rm && rm.quiz && rm.quiz.questions && rm.quiz.questions.length > 0) {
-      return rm.quiz;
-    }
-    return quizzes[id] || (rm?.slug && quizzes[rm.slug]) || quizzes['javascript'];
+    return rm?.quiz?.questions?.length > 0
+      ? rm.quiz
+      : { id: 'loading', title: 'Loading quiz...', timePerQuestion: 30, questions: [] };
   });
 
   const [phase, setPhase] = useState('quiz'); // 'quiz' | 'results'
