@@ -1,24 +1,11 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Upload, ArrowRight, BookOpen, Clock, TrendingUp, Flame, CheckCircle2, Circle, Loader, Trash2 } from 'lucide-react';
+import { Upload, ArrowRight, BookOpen, Clock, CheckCircle2, Circle, Loader, Trash2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import Navbar from '../components/Navbar';
 import ProgressRing from '../components/ProgressRing';
 import Footer from '../components/Footer';
-import { weeklyActivity } from '../data/mockData';
 import './Dashboard.css';
-
-function ActivityBar({ day, minutes, max }) {
-  const pct = (minutes / max) * 100;
-  return (
-    <div className="activity-bar-col">
-      <div className="activity-bar-track">
-        <div className="activity-bar-fill" style={{ height: `${pct}%` }} />
-      </div>
-      <span className="activity-bar-day">{day}</span>
-    </div>
-  );
-}
 
 export default function Dashboard() {
   const { state, deleteSyllabus } = useApp();
@@ -31,7 +18,6 @@ export default function Dashboard() {
   const totalProgress = uploadedSyllabi.length > 0
     ? Math.round(uploadedSyllabi.reduce((a, b) => a + (b.progress || 0), 0) / uploadedSyllabi.length)
     : 0;
-  const maxActivity = Math.max(...weeklyActivity.map(d => d.minutes));
 
   const getStatusIcon = (progress) => {
     if (progress === 100) return <CheckCircle2 size={14} className="ds-status-icon done" />;
@@ -186,20 +172,6 @@ export default function Dashboard() {
 
             {/* Right: Activity + Quiz results */}
             <div className="ds-col-side">
-              {/* Weekly Activity */}
-              <div className="ds-widget card">
-                <div className="ds-widget-header">
-                  <h3 className="ds-widget-title">
-                    <TrendingUp size={14} /> Weekly Activity
-                  </h3>
-                  <span className="ds-widget-sub">minutes/day</span>
-                </div>
-                <div className="activity-bars">
-                  {weeklyActivity.map(({ day, minutes }) => (
-                    <ActivityBar key={day} day={day} minutes={minutes} max={maxActivity} />
-                  ))}
-                </div>
-              </div>
 
               {/* Streak badge */}
               <div className="ds-streak-card card">
