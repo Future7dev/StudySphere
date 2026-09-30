@@ -6,6 +6,7 @@ import {
   TrendingUp, Code, Layers
 } from 'lucide-react';
 import Footer from '../components/Footer';
+import GradientWaves from './GradientWaves';
 import './Landing.css';
 
 const features = [
@@ -166,12 +167,30 @@ export default function Landing() {
 
       {/* ── Hero ── */}
       <section className="hero" ref={heroRef}>
-        {/* Background elements */}
-        <div className="hero-bg">
-          <div className="hero-bg-grid" />
-          <div className="hero-bg-glow-1" />
-          <div className="hero-bg-glow-2" />
-          <div className="hero-bg-noise" />
+        {/* GradientWaves background */}
+        <div className="hero-gradient-waves-bg">
+          <GradientWaves
+            horizonColor="#ae285d"
+            waveColor="#842e45"
+            crestColor="#f7e9e9"
+            speed={0.4}
+            amplitude={2.5}
+            waveScale={0.6}
+            waveRatio={0.9}
+            swell={35}
+            turbulence={20}
+            tilt={1.11}
+            zoom={1}
+            height={5.5}
+            fogDepth={15}
+            detail="medium"
+            brightness={1}
+            opacity={1}
+            mouseInteraction
+            parallaxStrength={0.5}
+            grain
+            grainIntensity={0.05}
+          />
         </div>
 
         <div className="hero-container">

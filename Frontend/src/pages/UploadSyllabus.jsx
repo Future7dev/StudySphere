@@ -4,7 +4,6 @@ import { Upload, FileText, X, ArrowRight, Sparkles, AlertCircle } from 'lucide-r
 import { useApp } from '../context/AppContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { roadmaps } from '../data/mockData';
 import './UploadSyllabus.css';
 
 import API from '../api/axios';

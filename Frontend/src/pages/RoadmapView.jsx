@@ -19,7 +19,6 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import ProgressRing from '../components/ProgressRing';
 import RoadmapFlow from '../components/roadmap/RoadmapFlow';
-import { roadmaps } from '../data/mockData';
 import API from '../api/axios';
 import './RoadmapView.css';
 
@@ -84,8 +83,7 @@ export default function RoadmapView() {
   const [roadmap, setRoadmap] = useState(() => {
     return (
       (state.roadmaps && state.roadmaps.find(r => r.slug === id || r.id === id || r._id === id)) ||
-      roadmaps.find(r => r.id === id) ||
-      roadmaps[0]
+      { id, title: '', nodes: [], category: '', difficulty: '', estimatedHours: 0, description: '' }
     );
   });
 

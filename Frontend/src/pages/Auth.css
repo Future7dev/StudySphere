@@ -4,18 +4,36 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   min-height: 100vh;
+  position: relative; /* contain the absolute fibers background */
 }
+
+/* GhostFibers full-page background */
+.auth-fibers-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.auth-fibers-bg > * {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 
 /* ── Left Panel ──────────────────────────────────────────────────────────────── */
 .auth-left {
-  background: var(--bg-1);
-  border-right: 1px solid var(--border);
+  background: rgba(5, 5, 12, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-right: 1px solid rgba(255, 255, 255, 0.07);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--space-16) var(--space-12);
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 /* Grid background */
@@ -49,6 +67,20 @@
   gap: var(--space-10);
   position: relative;
   z-index: 1;
+}
+
+/* ── Right Panel ─────────────────────────────────────────────────────────────── */
+.auth-right {
+  background: rgba(8, 6, 18, 0.78);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-12) var(--space-8);
+  position: relative;
+  z-index: 1;
+  overflow-y: auto;
 }
 
 .auth-logo {
@@ -185,14 +217,6 @@
   font-weight: 500;
 }
 
-/* ── Right Panel ─────────────────────────────────────────────────────────────── */
-.auth-right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-12);
-  background: var(--bg);
-}
 
 .auth-form-wrap {
   max-width: 420px;

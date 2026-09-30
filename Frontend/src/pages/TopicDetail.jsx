@@ -4,7 +4,6 @@ import { ArrowLeft, CheckCircle2, Circle, Loader, Play, ExternalLink, BookOpen, 
 import { useApp } from '../context/AppContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { topicDetails, quizzes } from '../data/mockData';
 import './TopicDetail.css';
 
 const resourceTypeConfig = {
@@ -41,10 +40,8 @@ export default function TopicDetail() {
   const navigate = useNavigate();
   const { state, dispatch, trackTopicProgress } = useApp();
 
-  // Dynamically resolve topic from generated roadmaps or mockData
+  // Dynamically resolve topic from generated roadmaps
   const topic = React.useMemo(() => {
-    if (topicDetails[id]) return topicDetails[id];
-
     // Search in all loaded roadmaps
     for (const rm of state.roadmaps || []) {
       for (const node of rm.nodes || []) {
