@@ -1,14 +1,20 @@
 import React, { createContext, useContext, useReducer } from 'react';
-import { roadmaps, userProfile } from '../data/mockData';
 import API from '../api/axios';
 
 const AppContext = createContext(null);
 
-const defaultSyllabi = [
-  { id: 'web-dev', title: 'Full-Stack Web Development', uploadedAt: '2026-08-10', progress: 42 },
-  { id: 'ml-ai',  title: 'Machine Learning & AI',      uploadedAt: '2026-08-15', progress: 28 },
-  { id: 'dsa',    title: 'Data Structures & Algorithms',uploadedAt: '2026-08-20', progress: 35 },
-];
+const defaultUser = {
+  name: '',
+  email: '',
+  avatar: null,
+  streak: 0,
+  totalTopicsCompleted: 0,
+  totalQuizzesTaken: 0,
+  averageQuizScore: 0,
+  badges: [],
+};
+
+const defaultSyllabi = [];
 
 const getDeletedSyllabi = () => {
   try {
@@ -62,12 +68,10 @@ const baseSyllabi = savedSyllabi !== null ? savedSyllabi : defaultSyllabi;
 const initialUploadedSyllabi = baseSyllabi.filter(
   s => !initialDeleted.includes(s.id) && !initialDeleted.includes(s.slug) && !initialDeleted.includes(s._id)
 );
-const initialRoadmaps = roadmaps.filter(
-  r => !initialDeleted.includes(r.id) && !initialDeleted.includes(r.slug) && !initialDeleted.includes(r._id)
-);
+const initialRoadmaps = [];
 
 const initialState = {
-  user: savedUser ? { ...userProfile, ...savedUser } : userProfile,
+  user: savedUser ? { ...defaultUser, ...savedUser } : defaultUser,
   isAuthenticated: hasToken,
   roadmaps: initialRoadmaps,
   topicProgress: {
@@ -100,9 +104,9 @@ function reducer(state, action) {
       return {
         ...state,
         isAuthenticated: false,
-        user: userProfile,
-        uploadedSyllabi: defaultSyllabi,
-        roadmaps: roadmaps,
+        user: defaultUser,
+        uploadedSyllabi: [],
+        roadmaps: [],
       };
     case 'SIGNUP':
       return { ...state, isAuthenticated: true, user: { ...state.user, ...action.payload } };
