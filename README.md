@@ -42,13 +42,15 @@ LangGraph orchestrates the different stages of roadmap generation.
 ```text
 START
   ↓
-Roadmap Node (Generates Subtopics & Concepts)
+Roadmap Node (Generates Subtopics & Concepts tailored to user's knowledge level and goal)
   ↓
 YouTube Node (Parallelized search for video resources)
   ↓
 Article Node (Parallelized search for text resources)
   ↓
-Quiz Node (Generates MCQ assessments)
+Flashcard Node (Generates Spaced Repetition flashcards)
+  ↓
+Quiz Node (Generates MCQ assessments dynamically scaled based on previous scores)
   ↓
 END
 ```
@@ -58,8 +60,8 @@ The roadmap acts as the central object progressively enriched by the other nodes
 ## Responsibilities of Each Node
 
 ### Roadmap Node
-* Understanding the user's topic
-* Creating the learning structure (Foundations → Intermediate → Advanced)
+* Understanding the user's topic, current knowledge level, and learning goal
+* Creating a tailored learning structure (Foundations → Intermediate → Advanced)
 * Generating concepts, assigning difficulty, and providing definitions
 
 ### YouTube Node
@@ -70,8 +72,13 @@ The roadmap acts as the central object progressively enriched by the other nodes
 * Optimized parallel searching for educational articles
 * Adding article URLs to the roadmap
 
+### Flashcard Node
+* Generating high-yield Q&A flashcards for Spaced Repetition Systems (SRS)
+* Highlighting key definitions and critical facts
+
 ### Quiz Node
 * Generating a multiple-choice quiz based on the user's topic
+* Scaling difficulty automatically based on the user's past quiz scores (Progressive Quizzes)
 * Providing options, answers, and explanations
 
 ## Development Status
@@ -79,13 +86,15 @@ The roadmap acts as the central object progressively enriched by the other nodes
 | Component                  | Status            |
 | -------------------------- | ----------------- |
 | User topic input           | Completed         |
+| Personalized Learning Path | Completed         |
 | Roadmap generation         | Completed         |
 | Pydantic roadmap structure | Completed         |
 | LangGraph workflow         | Completed         |
 | Database storage (MongoDB) | Completed         |
 | YouTube node               | Completed         |
 | Article node               | Completed         |
-| Quiz generation            | Completed         |
+| Flashcard generation       | Completed         |
+| Progressive Quiz generation| Completed         |
 | React Frontend & Visuals   | Completed         |
 | Progress tracking          | Completed/Ongoing |
 | Dashboard                  | Completed/Ongoing |
