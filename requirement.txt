@@ -8,6 +8,7 @@ pydantic
 requests
 jupyter
 tavily
-google-api-python-clientredis
+google-api-python-client
+redis
 fastapi
 uvicorn
