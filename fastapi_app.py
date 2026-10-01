@@ -97,6 +97,7 @@ def generate_roadmap_and_quiz(req: GenerateRequest):
 
         roadmap = final_state.get("roadmap")
         quiz = final_state.get("quiz")
+        flashcards = final_state.get("flashcards")
 
         if not roadmap:
             raise HTTPException(
@@ -107,6 +108,7 @@ def generate_roadmap_and_quiz(req: GenerateRequest):
             "success": True,
             "roadmap": roadmap,
             "quiz": quiz,
+            "flashcards": flashcards,
         }
 
         # Cache in Redis

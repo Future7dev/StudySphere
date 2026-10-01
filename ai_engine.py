@@ -43,6 +43,7 @@ class SubjectState(TypedDict):
     goal: str
     roadmap: dict[str, Any]
     quiz: dict[str, Any]
+    flashcards: dict[str, Any]
 
 class Topic(BaseModel):
     name: str
@@ -74,6 +75,15 @@ class Quiz(BaseModel):
     questions: List[Question]
 
 quiz_struct_model = model.with_structured_output(Quiz)
+
+class Flashcard(BaseModel):
+    front: str
+    back: str
+
+class FlashcardDeck(BaseModel):
+    cards: List[Flashcard]
+
+flashcard_struct_model = model.with_structured_output(FlashcardDeck)
 
 # ==========================================
 # PROMPTS
@@ -125,6 +135,14 @@ For each question:
 - Provide 4 options.
 - Specify the exact correct answer (must match one of the options).
 - Provide a short explanation of why the answer is correct."""
+
+flashcard_prompt = """You are an expert Spaced Repetition System (SRS) content creator.
+Generate a deck of flashcards for the topic provided by the user.
+Generate 10 high-yield flashcards covering the most important concepts, definitions, and facts.
+
+For each flashcard:
+- Provide the 'front' of the card (a clear, concise question or term).
+- Provide the 'back' of the card (a clear, accurate, and easily digestible answer or definition)."""
 
 # ==========================================
 # SEARCH FUNCTIONS
@@ -208,6 +226,15 @@ def quiznode(state: SubjectState):
     quiz = response.model_dump()
     return {"quiz": quiz}
 
+def flashcardnode(state: SubjectState):
+    sysquery = SystemMessage(content=flashcard_prompt)
+    humquery = HumanMessage(content=state["topic"])
+    query = [sysquery, humquery]
+
+    response = flashcard_struct_model.invoke(query)
+    flashcards = response.model_dump()
+    return {"flashcards": flashcards}
+
 def fast_youtube_node(state: SubjectState):
     roadmap = state["roadmap"]
     topics = []
@@ -256,12 +283,14 @@ def build_workflow():
     graph.add_node("roadmap", roadmapnode)
     graph.add_node("youtube", fast_youtube_node)
     graph.add_node("article", fast_article_node)
+    graph.add_node("flashcards", flashcardnode)
     graph.add_node("quiz", quiznode)
 
     graph.add_edge(START, "roadmap")
     graph.add_edge("roadmap", "youtube")
     graph.add_edge("youtube", "article")
-    graph.add_edge("article", "quiz")
+    graph.add_edge("article", "flashcards")
+    graph.add_edge("flashcards", "quiz")
     graph.add_edge("quiz", END)
 
     return graph.compile()
