@@ -39,6 +39,8 @@ else:
 class SubjectState(TypedDict):
     topic: str
     previous_score: str
+    knowledge_level: str
+    goal: str
     roadmap: dict[str, Any]
     quiz: dict[str, Any]
 
@@ -168,7 +170,19 @@ def search_best_youtube_video(query: str) -> str:
 # ==========================================
 
 def roadmapnode(state: SubjectState):
-    sysquery = SystemMessage(content=prompt)
+    dynamic_prompt = prompt
+
+    k_level = state.get("knowledge_level")
+    goal = state.get("goal")
+
+    if k_level or goal:
+        dynamic_prompt += "\n\nAdditional Context:\n"
+        if k_level:
+            dynamic_prompt += f"- The user's current knowledge level is: {k_level}. Tailor the depth of the roadmap accordingly.\n"
+        if goal:
+            dynamic_prompt += f"- The user's learning goal is: {goal}. Focus the topics to specifically help them achieve this goal.\n"
+
+    sysquery = SystemMessage(content=dynamic_prompt)
     humquery = HumanMessage(content=state["topic"])
     query = [sysquery, humquery]
 
