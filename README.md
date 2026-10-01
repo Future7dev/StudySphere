@@ -2,11 +2,11 @@
 
 LearnXYZ is an AI-powered learning platform that helps users learn any topic by generating a structured learning roadmap and providing relevant learning resources.
 
-The main idea is to take a topic from the user and break it down into a logical sequence of subtopics and concepts, making it easier for the user to understand what they should learn and in what order.
+The platform takes a topic from the user and breaks it down into a logical sequence of subtopics and concepts, making it easier for the user to understand what they should learn and in what order.
 
 ## Project Goal
 
-The platform will eventually provide:
+The platform provides:
 
 * Learning roadmap for any topic
 * Important subtopics and concepts
@@ -17,355 +17,105 @@ The platform will eventually provide:
 * User dashboard containing previously searched topics
 * Progress tracking
 
-## Current Implementation
+## Architecture
 
-The current version focuses on generating the **learning roadmap** and **interactive quizzes**.
+LearnXYZ has evolved into a full-stack application composed of three main services:
 
-The current workflow is:
+1. **Frontend (React/Vite)**
+   - Interactive user interface built with React, Vite, and `@xyflow/react` for rendering mindmap-style roadmaps.
+   - User authentication and dashboard views to track progress.
 
-```text
-User Input
-    ↓
-LLM
-    ↓
-Structured Roadmap & Quiz
-    ↓
-LangGraph State
-    ↓
-JSON Storage
-```
+2. **Backend (Node.js/Express)**
+   - REST API connecting the frontend to the database and the AI generation engine.
+   - Uses MongoDB (Mongoose) for persistent storage of users, roadmaps, and progress (replacing the old `module.json` file storage).
+   - Handles user authentication (JWT/bcrypt).
 
-The roadmap is generated using an LLM and structured using Pydantic models.
+3. **AI Engine (Python/FastAPI)**
+   - A persistent FastAPI server that orchestrates the LangGraph workflow, encapsulated in modular Python files (`ai_engine.py`).
+   - Features parallelized node execution for YouTube and Article retrieval to reduce network latency.
+   - Implements distributed caching using **Redis** to store and instantly return previously generated roadmaps, saving on LLM costs and ensuring scalability.
 
-## Planned Workflow
+## LangGraph Workflow
 
-The complete system will eventually follow this flow:
-
-```text
-                    User enters topic
-                           ↓
-                    Roadmap Generator
-                           ↓
-                    Learning Roadmap
-                           ↓
-              ┌────────────┴────────────┐
-              ↓                         ↓
-        YouTube Search             Article Search
-              ↓                         ↓
-              └────────────┬────────────┘
-                           ↓
-                    Enriched Roadmap
-                           ↓
-                     Quiz Generation
-                           ↓
-                  Progress Tracking
-                           ↓
-                       Dashboard
-```
-
-## Roadmap Generation
-
-The roadmap generator takes the user's topic and determines:
-
-1. The major subtopics required to understand the topic.
-2. The order in which those subtopics should be learned.
-3. The concepts contained within each subtopic.
-4. The difficulty of each concept.
-5. A short description/definition of each concept.
-
-The roadmap should generally progress from:
-
-```text
-Foundations
-    ↓
-Intermediate Concepts
-    ↓
-Advanced Concepts
-```
-
-The number of subtopics and concepts should depend on the complexity of the requested topic.
-
-## Roadmap Structure
-
-The roadmap follows this general hierarchy:
-
-```text
-Topic
-│
-├── Definition
-│
-└── Subtopics
-    │
-    ├── Subtopic
-    │   ├── Difficulty
-    │   ├── Definition
-    │   │
-    │   └── Topics
-    │       ├── Topic
-    │       │   ├── Difficulty
-    │       │   └── Definition
-    │       │
-    │       └── Topic
-    │
-    └── Subtopic
-        └── ...
-```
-
-Later, each topic will also contain its learning resources:
-
-```text
-Topic
-├── Definition
-├── Difficulty
-├── Videos
-└── Articles
-```
-
-## LangGraph
-
-LangGraph is used to orchestrate the different stages of the application.
-
-The current graph contains:
+LangGraph orchestrates the different stages of roadmap generation.
 
 ```text
 START
   ↓
-MindMap (Roadmap Node)
-  ├──→ YouTube Node
-  ├──→ Article Node
-  └──→ Quiz Node
-         ↓
-    JSON Save Node
-         ↓
-        END
-```
-
-The planned graph will contain even more nodes for additional learning resources.
-
-```text
-START
+Roadmap Node (Generates Subtopics & Concepts tailored to user's knowledge level and goal)
   ↓
-Roadmap Node
+YouTube Node (Parallelized search for video resources)
   ↓
-YouTube Node
+Article Node (Parallelized search for text resources)
   ↓
-Article Node
+Flashcard Node (Generates Spaced Repetition flashcards)
   ↓
-JSON Save
+Quiz Node (Generates MCQ assessments dynamically scaled based on previous scores)
   ↓
 END
 ```
 
-The roadmap is maintained inside the LangGraph state so that each node can access and modify it.
-
-## State
-
-The current state contains:
-
-```text
-topic
-roadmap
-quiz
-```
-
-The `topic` represents the user's requested subject.
-
-The `roadmap` contains the structured roadmap generated by the LLM.
-
-The roadmap acts as the central object that will be progressively enriched by the other nodes.
-
-## YouTube Node
-
-The YouTube node is responsible for finding relevant videos for each topic in the roadmap.
-
-The expected process is:
-
-```text
-Roadmap
-   ↓
-Extract Topics
-   ↓
-Search YouTube
-   ↓
-Retrieve Real Videos
-   ↓
-Filter Relevant Results
-   ↓
-Attach Videos to Topics
-```
-
-The YouTube node should retrieve actual video URLs from a search/API service rather than asking the LLM to generate URLs.
-
-## Article Node
-
-The Article node is responsible for finding relevant educational articles for each topic.
-
-The expected process is:
-
-```text
-Roadmap
-   ↓
-Extract Topics
-   ↓
-Search Web / Article Sources
-   ↓
-Retrieve Articles
-   ↓
-Filter Relevant Results
-   ↓
-Attach Articles to Topics
-```
-
-The article node should use actual search results and URLs rather than relying on the LLM to generate URLs.
-
-## Quiz Node
-
-The Quiz node is responsible for generating assessment questions for the user's topic.
-
-The expected process is:
-
-```text
-Topic Input
-   ↓
-Generate MCQ Questions
-   ↓
-Attach Quiz to State
-```
-
-The quiz node generates 5 questions by default, complete with 4 options, the correct answer, and an explanation. If a user explicitly requests a specific number of questions in their topic (e.g., "History 10 questions"), it generates that exact amount.
-
-## JSON Storage
-
-The generated roadmap is stored in a JSON file.
-
-The JSON file acts as persistent storage for the generated roadmaps and can contain multiple topics.
-
-Example:
-
-```text
-module.json
-
-Machine Learning
-Web Development
-Data Science
-Cloud Computing
-...
-```
-
-The JSON will eventually contain the enriched roadmap and quizzes:
-
-```text
-Topic
- ├── roadmap
- │    └── Subtopics
- │         └── Topics
- │              ├── Definition
- │              ├── Difficulty
- │              ├── Videos
- │              └── Articles
- └── quiz
-      └── Questions
-           ├── Options
-           ├── Correct Answer
-           └── Explanation
-```
+The roadmap acts as the central object progressively enriched by the other nodes in the state.
 
 ## Responsibilities of Each Node
 
-Each node should have a specific responsibility.
-
 ### Roadmap Node
-
-Responsible for:
-
-* Understanding the user's topic
-* Creating the learning structure
-* Generating subtopics
-* Generating concepts
-* Assigning difficulty
-* Providing definitions
+* Understanding the user's topic, current knowledge level, and learning goal
+* Creating a tailored learning structure (Foundations → Intermediate → Advanced)
+* Generating concepts, assigning difficulty, and providing definitions
 
 ### YouTube Node
-
-Responsible for:
-
-* Searching for videos
-* Selecting relevant videos
-* Adding video information to the roadmap
+* Optimized parallel searching for relevant videos
+* Adding video information (URLs) to the roadmap
 
 ### Article Node
+* Optimized parallel searching for educational articles
+* Adding article URLs to the roadmap
 
-Responsible for:
-
-* Searching for articles
-* Selecting relevant articles
-* Adding article information to the roadmap
-
-### JSON Save Node
-
-Responsible for:
-
-* Persisting the roadmap
-* Saving the updated roadmap after resources are added
+### Flashcard Node
+* Generating high-yield Q&A flashcards for Spaced Repetition Systems (SRS)
+* Highlighting key definitions and critical facts
 
 ### Quiz Node
-
-Responsible for:
-
 * Generating a multiple-choice quiz based on the user's topic
+* Scaling difficulty automatically based on the user's past quiz scores (Progressive Quizzes)
 * Providing options, answers, and explanations
-* Scaling the number of questions based on user request
 
 ## Development Status
 
 | Component                  | Status            |
 | -------------------------- | ----------------- |
 | User topic input           | Completed         |
+| Personalized Learning Path | Completed         |
 | Roadmap generation         | Completed         |
 | Pydantic roadmap structure | Completed         |
 | LangGraph workflow         | Completed         |
-| JSON storage               | Completed         |
-| YouTube node               | To be implemented |
-| Article node               | To be implemented |
-| Resource filtering/ranking | To be implemented |
-| Quiz generation            | Completed         |
-| Progress tracking          | Planned           |
-| Dashboard                  | Planned           |
+| Database storage (MongoDB) | Completed         |
+| YouTube node               | Completed         |
+| Article node               | Completed         |
+| Flashcard generation       | Completed         |
+| Progressive Quiz generation| Completed         |
+| React Frontend & Visuals   | Completed         |
+| Progress tracking          | Completed/Ongoing |
+| Dashboard                  | Completed/Ongoing |
 
-## Development Principle
+## Getting Started
 
-The project should keep the roadmap generation and resource retrieval separate.
+*(Ensure you have configured your `.env` variables for MongoDB, API keys, etc.)*
 
-The LLM determines:
-
-> **What should the user learn?**
-
-The YouTube node determines:
-
-> **Which videos are useful for learning it?**
-
-The Article node determines:
-
-> **Which articles are useful for learning it?**
-
-This separation makes each component easier to develop, test, and replace independently.
-
-## Future Architecture
-
-The final platform is intended to evolve into an AI-powered learning assistant where the user can enter any topic and receive:
-
-```text
-Topic
-  ↓
-Personalized Learning Roadmap
-  ↓
-Learning Resources
-  ↓
-Quizzes
-  ↓
-Progress Evaluation
-  ↓
-Personalized Learning Experience
-```
-
-The immediate development priority is to complete the **YouTube and Article nodes** and produce a reliable enriched roadmap.
+1. **Start the AI Engine:**
+   *(Ensure you have a local Redis server running on port 6379 for caching)*
+   ```bash
+   cd Backend
+   npm run fastapi
+   ```
+2. **Start the Node Backend:**
+   ```bash
+   cd Backend
+   npm run dev
+   ```
+3. **Start the Frontend:**
+   ```bash
+   cd Frontend
+   npm run dev
+   ```
