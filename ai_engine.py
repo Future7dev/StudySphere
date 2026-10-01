@@ -38,6 +38,7 @@ else:
 
 class SubjectState(TypedDict):
     topic: str
+    previous_score: str
     roadmap: dict[str, Any]
     quiz: dict[str, Any]
 
@@ -176,7 +177,16 @@ def roadmapnode(state: SubjectState):
     return {"roadmap": roadmap}
 
 def quiznode(state: SubjectState):
-    sysquery = SystemMessage(content=quiz_prompt)
+    dynamic_prompt = quiz_prompt
+    
+    # In-Context Progressive Quiz Logic
+    prev_score_str = state.get("previous_score")
+    if prev_score_str:
+        dynamic_prompt += f"\n\nContext: The user scored {prev_score_str} on their previous quiz related to this topic. "
+        dynamic_prompt += "If the score is low (e.g., under 50%), generate an easier, foundational-level quiz. "
+        dynamic_prompt += "If the score is high (e.g., over 80%), generate a highly advanced, challenging quiz to push their limits."
+
+    sysquery = SystemMessage(content=dynamic_prompt)
     humquery = HumanMessage(content=state["topic"])
     query = [sysquery, humquery]
 

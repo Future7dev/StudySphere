@@ -43,6 +43,7 @@ app.add_middleware(
 
 class GenerateRequest(BaseModel):
     topic: str
+    previous_score: str | None = None
 
 @app.get("/health")
 def health_check():
@@ -66,7 +67,8 @@ def generate_roadmap_and_quiz(req: GenerateRequest):
         raise HTTPException(status_code=400, detail="Topic must not be empty.")
 
     clean_topic = req.topic.strip()
-    cache_key = f"learnxyz:roadmap:{clean_topic.lower()}"
+    score_suffix = f":{req.previous_score}" if req.previous_score else ""
+    cache_key = f"learnxyz:roadmap:{clean_topic.lower()}{score_suffix}"
 
     # Redis cache check
     try:
@@ -82,7 +84,10 @@ def generate_roadmap_and_quiz(req: GenerateRequest):
 
     try:
         print(f"[MODEL] Running warm LangGraph model for new topic: '{clean_topic}'...")
-        final_state = workflow.invoke({"topic": clean_topic})
+        final_state = workflow.invoke({
+            "topic": clean_topic,
+            "previous_score": req.previous_score
+        })
 
         roadmap = final_state.get("roadmap")
         quiz = final_state.get("quiz")
