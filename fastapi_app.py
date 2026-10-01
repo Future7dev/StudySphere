@@ -1,4 +1,6 @@
 import os
+import json
+import redis
 from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException
@@ -11,7 +13,9 @@ project_root = Path(__file__).resolve().parent
 
 # In-memory warm storage
 workflow = None
-FAST_CACHE = {}
+
+# Initialize Redis client
+redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -42,27 +46,36 @@ class GenerateRequest(BaseModel):
 
 @app.get("/health")
 def health_check():
+    try:
+        redis_ping = redis_client.ping()
+    except Exception:
+        redis_ping = False
+        
     return {
         "status": "ok",
         "service": "LearnXYZ FastAPI Persistent Model Engine",
         "model_loaded": workflow is not None,
-        "cached_topics_count": len(FAST_CACHE),
+        "redis_connected": redis_ping,
     }
 
 @app.post("/generate")
 def generate_roadmap_and_quiz(req: GenerateRequest):
-    global workflow, FAST_CACHE
+    global workflow
 
     if not req.topic or not req.topic.strip():
         raise HTTPException(status_code=400, detail="Topic must not be empty.")
 
     clean_topic = req.topic.strip()
-    cache_key = clean_topic.lower()
+    cache_key = f"learnxyz:roadmap:{clean_topic.lower()}"
 
-    # Instant memory cache check (0ms response if already requested in this session)
-    if cache_key in FAST_CACHE:
-        print(f"[CACHE] Returning '{clean_topic}' instantly from FastAPI in-memory cache!")
-        return FAST_CACHE[cache_key]
+    # Redis cache check
+    try:
+        cached_result = redis_client.get(cache_key)
+        if cached_result:
+            print(f"[CACHE] Returning '{clean_topic}' instantly from Redis cache!")
+            return json.loads(cached_result)
+    except Exception as e:
+        print(f"[WARNING] Redis cache get error: {e}")
 
     if workflow is None:
         workflow = build_workflow()
@@ -85,9 +98,13 @@ def generate_roadmap_and_quiz(req: GenerateRequest):
             "quiz": quiz,
         }
 
-        # Cache in memory
-        FAST_CACHE[cache_key] = result
-        print(f"[DONE] Finished generating '{clean_topic}'! Stored in warm memory.")
+        # Cache in Redis
+        try:
+            redis_client.setex(cache_key, 86400, json.dumps(result))
+            print(f"[DONE] Finished generating '{clean_topic}'! Stored in Redis.")
+        except Exception as e:
+            print(f"[WARNING] Redis cache set error: {e}")
+            
         return result
 
     except Exception as e:
